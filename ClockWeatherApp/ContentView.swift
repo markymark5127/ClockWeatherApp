@@ -42,7 +42,9 @@ func getCurrentTime() -> (hour: String, minute: String) {
 
 func requestLocation(weather: WeatherFetcher) {
     let manager = CLLocationManager()
-    manager.requestWhenInUseAuthorization()
+    if Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") != nil {
+        manager.requestWhenInUseAuthorization()
+    }
     if let location = manager.location {
         let coords = location.coordinate
         weather.fetchWeather(lat: coords.latitude, lon: coords.longitude)

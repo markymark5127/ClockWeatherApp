@@ -1,6 +1,36 @@
 import WidgetKit
 import SwiftUI
 
+/// Simplified flip digit view for the widget. This avoids needing to share
+/// sources between targets while still providing the flip animation.
+struct WidgetFlipDigitView: View {
+    let digit: String
+    @State private var previousDigit: String = ""
+    @State private var rotation: Double = 0
+
+    var body: some View {
+        Text(previousDigit)
+            .font(.system(size: 36, weight: .bold, design: .rounded))
+            .frame(width: 40, height: 60)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .rotation3DEffect(.degrees(rotation), axis: (x: 1, y: 0, z: 0))
+            .onAppear { previousDigit = digit }
+            .onChange(of: digit) { newValue in
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    rotation = -90
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    previousDigit = newValue
+                    rotation = 90
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        rotation = 0
+                    }
+                }
+            }
+    }
+}
+
 struct ClockWeatherEntry: TimelineEntry {
     let date: Date
     let temperature: String
@@ -61,17 +91,8 @@ struct ClockWeatherWidgetEntryView: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 6) {
-                Text(entry.hour)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .frame(width: 40, height: 60)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-
-                Text(entry.minute)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .frame(width: 40, height: 60)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                WidgetFlipDigitView(digit: entry.hour)
+                WidgetFlipDigitView(digit: entry.minute)
             }
 
             VStack(alignment: .leading) {
@@ -79,11 +100,9 @@ struct ClockWeatherWidgetEntryView: View {
                 Text(entry.condition).font(.caption2)
                 Text(entry.temperature).font(.title2).bold()
             }
-            .padding(8)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .padding()
+        .containerBackground(.ultraThinMaterial, for: .widget)
     }
 }
 
