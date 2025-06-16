@@ -102,7 +102,7 @@ struct ClockWeatherWidgetEntryView: View {
             }
         }
         .padding()
-        .containerBackground(.ultraThinMaterial, for: .widget)
+        .containerBackground(Color.clear, for: .widget)
     }
 }
 
