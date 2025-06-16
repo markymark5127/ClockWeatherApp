@@ -12,6 +12,8 @@ import WidgetKit
 struct ContentView: View {
     @State private var time = getCurrentTime()
     @StateObject var weather = WeatherFetcher()
+    @StateObject var locationManager = LocationManager()
+    @State private var showSettings = false
 
     var body: some View {
         VStack(spacing: 16) {
@@ -23,12 +25,20 @@ struct ContentView: View {
             GlassWeatherCard(weather: weather)
                 .frame(height: 80)
                 .padding(.horizontal)
+            Button("Settings") { showSettings = true }
         }
         .onAppear {
-            requestLocation(weather: weather)
             Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
                 self.time = getCurrentTime()
             }
+        }
+        .onChange(of: locationManager.location) { _, newValue in
+            if let loc = newValue {
+                weather.fetchWeather(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude)
+            }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView(weather: weather)
         }
     }
 }
@@ -40,13 +50,3 @@ func getCurrentTime() -> (hour: String, minute: String) {
     return (String(time[0]), String(time[1]))
 }
 
-func requestLocation(weather: WeatherFetcher) {
-    let manager = CLLocationManager()
-    if Bundle.main.object(forInfoDictionaryKey: "NSLocationWhenInUseUsageDescription") != nil {
-        manager.requestWhenInUseAuthorization()
-    }
-    if let location = manager.location {
-        let coords = location.coordinate
-        weather.fetchWeather(lat: coords.latitude, lon: coords.longitude)
-    }
-}

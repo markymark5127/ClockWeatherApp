@@ -1,6 +1,8 @@
 
 import Foundation
 import CoreLocation
+import SwiftUI
+import WidgetKit
 
 struct WeatherResponse: Decodable {
     struct CurrentWeather: Decodable {
@@ -15,11 +17,15 @@ class WeatherFetcher: ObservableObject {
     @Published var temperature: String = "--"
     @Published var condition: String = "Loading..."
     @Published var city: String = "Locating..."
+    @AppStorage("unit") var unit: String = "fahrenheit"
+
+    private var lastCoordinates: CLLocationCoordinate2D?
 
     let sharedDefaults = UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp")
 
     func fetchWeather(lat: Double, lon: Double) {
-        let urlString = "https://api.open-meteo.com/v1/forecast?latitude=\(lat)&longitude=\(lon)&current_weather=true&temperature_unit=fahrenheit&timezone=auto"
+        lastCoordinates = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        let urlString = "https://api.open-meteo.com/v1/forecast?latitude=\(lat)&longitude=\(lon)&current_weather=true&temperature_unit=\(unit)&timezone=auto"
 
         guard let url = URL(string: urlString) else { return }
 
@@ -42,7 +48,11 @@ class WeatherFetcher: ObservableObject {
 
                 self.sharedDefaults?.setValue(temp, forKey: "temperature")
                 self.sharedDefaults?.setValue(desc, forKey: "condition")
+                self.sharedDefaults?.setValue(self.unit, forKey: "unit")
+                self.sharedDefaults?.setValue(self.lastCoordinates?.latitude, forKey: "lat")
+                self.sharedDefaults?.setValue(self.lastCoordinates?.longitude, forKey: "lon")
                 self.sharedDefaults?.setValue(Date(), forKey: "lastUpdated")
+                WidgetCenter.shared.reloadAllTimelines()
             }
         }.resume()
 
@@ -54,6 +64,21 @@ class WeatherFetcher: ObservableObject {
                     self.sharedDefaults?.setValue(city, forKey: "city")
                 }
             }
+        }
+    }
+
+    func updateCity(_ newCity: String) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(newCity) { placemarks, _ in
+            if let loc = placemarks?.first?.location {
+                self.fetchWeather(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude)
+            }
+        }
+    }
+
+    func refresh() {
+        if let coords = lastCoordinates {
+            fetchWeather(lat: coords.latitude, lon: coords.longitude)
         }
     }
 
