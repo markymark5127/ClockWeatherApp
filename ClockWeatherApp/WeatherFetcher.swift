@@ -24,20 +24,25 @@ class WeatherFetcher: ObservableObject {
         guard let url = URL(string: urlString) else { return }
 
         URLSession.shared.dataTask(with: url) { data, _, _ in
-            if let data = data {
-                if let decoded = try? JSONDecoder().decode(WeatherResponse.self, from: data) {
-                    DispatchQueue.main.async {
-                        let temp = "\(Int(decoded.current_weather.temperature))°"
-                        let desc = self.description(for: decoded.current_weather.weathercode)
-
-                        self.temperature = temp
-                        self.condition = desc
-
-                        self.sharedDefaults?.setValue(temp, forKey: "temperature")
-                        self.sharedDefaults?.setValue(desc, forKey: "condition")
-                        self.sharedDefaults?.setValue(Date(), forKey: "lastUpdated")
-                    }
+            guard let data = data,
+                  let decoded = try? JSONDecoder().decode(WeatherResponse.self, from: data) else {
+                DispatchQueue.main.async {
+                    self.temperature = "--"
+                    self.condition = "Unavailable"
                 }
+                return
+            }
+
+            DispatchQueue.main.async {
+                let temp = "\(Int(decoded.current_weather.temperature))°"
+                let desc = self.description(for: decoded.current_weather.weathercode)
+
+                self.temperature = temp
+                self.condition = desc
+
+                self.sharedDefaults?.setValue(temp, forKey: "temperature")
+                self.sharedDefaults?.setValue(desc, forKey: "condition")
+                self.sharedDefaults?.setValue(Date(), forKey: "lastUpdated")
             }
         }.resume()
 
