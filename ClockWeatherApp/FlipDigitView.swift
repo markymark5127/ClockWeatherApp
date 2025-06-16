@@ -24,7 +24,7 @@ struct FlipDigitView: View {
             )
             .rotation3DEffect(.degrees(rotation), axis: (x: 1, y: 0, z: 0))
             .onAppear { previousDigit = digit }
-            .onChange(of: digit) { newValue in
+            .onChange(of: digit) { _, newValue in
                 // Animate the digit flipping over when it changes.
                 withAnimation(.easeInOut(duration: 0.25)) {
                     rotation = -90
