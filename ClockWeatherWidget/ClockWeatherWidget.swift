@@ -16,7 +16,7 @@ struct WidgetFlipDigitView: View {
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .rotation3DEffect(.degrees(rotation), axis: (x: 1, y: 0, z: 0))
             .onAppear { previousDigit = digit }
-            .onChange(of: digit) { newValue in
+            .onChange(of: digit) { _, newValue in
                 withAnimation(.easeInOut(duration: 0.25)) {
                     rotation = -90
                 }
