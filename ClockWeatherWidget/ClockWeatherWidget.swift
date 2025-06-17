@@ -7,28 +7,73 @@ import Foundation
 struct WidgetFlipDigitView: View {
     let digit: String
     @State private var previousDigit: String = ""
-    @State private var rotation: Double = 0
+    @State private var topRotation: Double = 0
+    @State private var bottomRotation: Double = 0
 
     var body: some View {
-        Text(previousDigit)
-            .font(.system(size: 36, weight: .bold, design: .rounded))
-            .frame(width: 40, height: 60)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            .rotation3DEffect(.degrees(rotation), axis: (x: 1, y: 0, z: 0))
-            .onAppear { previousDigit = digit }
-            .onChange(of: digit) { _, newValue in
+        VStack(spacing: 0) {
+            // Top half
+            ZStack {
+                Text(previousDigit)
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .frame(width: 40, height: 30)
+                    .foregroundStyle(.primary)
+                    .background(.ultraThinMaterial)
+                    .clipped()
+
+                Text(digit)
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .frame(width: 40, height: 30)
+                    .foregroundStyle(.primary)
+                    .background(.ultraThinMaterial)
+                    .clipped()
+                    .opacity(topRotation <= -90 ? 1 : 0)
+            }
+            .overlay(
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(.gray.opacity(0.4)),
+                alignment: .bottom
+            )
+            .rotation3DEffect(.degrees(topRotation), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
+            .clipped()
+
+            // Bottom half
+            ZStack {
+                Text(previousDigit)
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .frame(width: 40, height: 30)
+                    .foregroundStyle(.primary)
+                    .background(.ultraThinMaterial)
+                    .clipped()
+                    .opacity(bottomRotation >= 90 ? 1 : 0)
+
+                Text(digit)
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .frame(width: 40, height: 30)
+                    .foregroundStyle(.primary)
+                    .background(.ultraThinMaterial)
+                    .clipped()
+                    .opacity(bottomRotation < 90 ? 1 : 0)
+            }
+            .rotation3DEffect(.degrees(bottomRotation), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
+            .clipped()
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .onAppear { previousDigit = digit }
+        .onChange(of: digit) { _, newValue in
+            withAnimation(.easeInOut(duration: 0.25)) {
+                topRotation = -90
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                previousDigit = newValue
+                topRotation = 0
+                bottomRotation = 90
                 withAnimation(.easeInOut(duration: 0.25)) {
-                    rotation = -90
-                }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    previousDigit = newValue
-                    rotation = 90
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        rotation = 0
-                    }
+                    bottomRotation = 0
                 }
             }
+        }
     }
 }
 
