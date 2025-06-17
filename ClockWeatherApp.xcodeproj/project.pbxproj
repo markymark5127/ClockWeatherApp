@@ -57,6 +57,7 @@
 		E7EC41332E003AA3008C76D7 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		E7EC41352E003AA3008C76D7 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		E7EC41552E003B6F008C76D7 /* ClockWeatherWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ClockWeatherWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7EE4FDE2E01ECBF00021051 /* ClockWeatherWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClockWeatherWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -132,6 +133,7 @@
 		E7EC40FA2E003A0F008C76D7 = {
 			isa = PBXGroup;
 			children = (
+				E7EE4FDE2E01ECBF00021051 /* ClockWeatherWidgetExtension.entitlements */,
 				E7EC41052E003A0F008C76D7 /* ClockWeatherApp */,
 				E7EC41132E003A16008C76D7 /* ClockWeatherAppTests */,
 				E7EC411D2E003A16008C76D7 /* ClockWeatherAppUITests */,
@@ -646,6 +648,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = ClockWeatherWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = B42P6USZ6A;
@@ -673,6 +676,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = ClockWeatherWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = B42P6USZ6A;
