@@ -16,6 +16,8 @@ struct ContentView: View {
     @State private var showSettings = false
     @AppStorage("timeFormat", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
     private var timeFormat: String = "24hr"
+    @AppStorage("locationMode", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    private var locationMode: String = "currentlocation"
 
     var body: some View {
         VStack(spacing: 16) {
@@ -38,7 +40,7 @@ struct ContentView: View {
             self.time = getCurrentTime()
         }
         .onChange(of: locationManager.location) { _, newValue in
-            if let loc = newValue {
+            if locationMode == "currentlocation", let loc = newValue {
                 weather.fetchWeather(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude)
             }
         }

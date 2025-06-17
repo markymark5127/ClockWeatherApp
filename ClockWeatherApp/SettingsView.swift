@@ -6,6 +6,8 @@ struct SettingsView: View {
     private var unit: String = "fahrenheit"
     @AppStorage("timeFormat", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
     private var timeFormat: String = "24hr"
+    @AppStorage("locationMode", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    private var locationMode: String = "currentlocation"
     @State private var cityName: String = ""
     @ObservedObject var weather: WeatherFetcher
 
@@ -13,10 +15,18 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section("Location") {
-                    TextField("City", text: $cityName)
-                        .textFieldStyle(.roundedBorder)
-                    Button("Update") {
-                        weather.updateCity(cityName)
+                    Picker("Source", selection: $locationMode) {
+                        Text("Current").tag("currentlocation")
+                        Text("Manual").tag("manual")
+                    }
+                    .pickerStyle(.segmented)
+
+                    if locationMode == "manual" {
+                        TextField("City", text: $cityName)
+                            .textFieldStyle(.roundedBorder)
+                        Button("Update") {
+                            weather.updateCity(cityName)
+                        }
                     }
                 }
 
