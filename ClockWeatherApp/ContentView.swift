@@ -14,6 +14,8 @@ struct ContentView: View {
     @StateObject var weather = WeatherFetcher()
     @StateObject var locationManager = LocationManager()
     @State private var showSettings = false
+    @AppStorage("timeFormat", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    private var timeFormat: String = "24hr"
 
     var body: some View {
         VStack(spacing: 16) {
@@ -32,6 +34,9 @@ struct ContentView: View {
                 self.time = getCurrentTime()
             }
         }
+        .onChange(of: timeFormat) { _, _ in
+            self.time = getCurrentTime()
+        }
         .onChange(of: locationManager.location) { _, newValue in
             if let loc = newValue {
                 weather.fetchWeather(lat: loc.coordinate.latitude, lon: loc.coordinate.longitude)
@@ -44,8 +49,10 @@ struct ContentView: View {
 }
 
 func getCurrentTime() -> (hour: String, minute: String) {
+    let defaults = UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp")
+    let format = defaults?.string(forKey: "timeFormat") ?? "24hr"
     let formatter = DateFormatter()
-    formatter.dateFormat = "HH:mm"
+    formatter.dateFormat = format == "12hr" ? "hh:mm" : "HH:mm"
     let time = formatter.string(from: Date()).split(separator: ":")
     return (String(time[0]), String(time[1]))
 }

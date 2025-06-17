@@ -17,7 +17,8 @@ class WeatherFetcher: ObservableObject {
     @Published var temperature: String = "--"
     @Published var condition: String = "Loading..."
     @Published var city: String = "Locating..."
-    @AppStorage("unit") var unit: String = "fahrenheit"
+    @AppStorage("unit", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    var unit: String = "fahrenheit"
 
     private var lastCoordinates: CLLocationCoordinate2D?
 

@@ -1,21 +1,26 @@
 import SwiftUI
+import WidgetKit
 
 struct SettingsView: View {
-    @AppStorage("unit") private var unit: String = "fahrenheit"
+    @AppStorage("unit", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    private var unit: String = "fahrenheit"
+    @AppStorage("timeFormat", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    private var timeFormat: String = "24hr"
     @State private var cityName: String = ""
     @ObservedObject var weather: WeatherFetcher
 
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("Location")) {
+                Section("Location") {
                     TextField("City", text: $cityName)
+                        .textFieldStyle(.roundedBorder)
                     Button("Update") {
                         weather.updateCity(cityName)
                     }
                 }
 
-                Section(header: Text("Units")) {
+                Section("Units") {
                     Picker("Units", selection: $unit) {
                         Text("Fahrenheit").tag("fahrenheit")
                         Text("Celsius").tag("celsius")
@@ -26,8 +31,21 @@ struct SettingsView: View {
                         weather.refresh()
                     }
                 }
+
+                Section("Clock Format") {
+                    Picker("Clock Format", selection: $timeFormat) {
+                        Text("24 Hour").tag("24hr")
+                        Text("12 Hour").tag("12hr")
+                    }
+                    .pickerStyle(.segmented)
+                    .onChange(of: timeFormat) { _, _ in
+                        WidgetCenter.shared.reloadAllTimelines()
+                    }
+                }
             }
+            .formStyle(.grouped)
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
