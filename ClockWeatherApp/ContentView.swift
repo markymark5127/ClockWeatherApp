@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreLocation
 import WidgetKit
+import UIKit
 
 struct ContentView: View {
     @State private var time: (hour: String, minute: String) = ("--", "--")
@@ -18,12 +19,14 @@ struct ContentView: View {
     private var timeFormat: String = "24hr"
     @AppStorage("locationMode", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
     private var locationMode: String = "currentlocation"
+    @AppStorage("fontName", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
+    private var fontName: String = UIFont.systemFont(ofSize: 17).familyName
 
     var body: some View {
         VStack(spacing: 16) {
             HStack(spacing: 8) {
-                FlipDigitView(digit: time.hour)
-                FlipDigitView(digit: time.minute)
+                FlipDigitView(digit: time.hour, fontName: fontName)
+                FlipDigitView(digit: time.minute, fontName: fontName)
             }
 
             GlassWeatherCard(weather: weather)

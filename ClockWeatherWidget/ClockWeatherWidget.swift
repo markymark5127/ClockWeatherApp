@@ -1,11 +1,13 @@
 import WidgetKit
 import SwiftUI
 import Foundation
+import UIKit
 
 /// Simplified flip digit view for the widget. This avoids needing to share
 /// sources between targets while still providing the flip animation.
 struct WidgetFlipDigitView: View {
     let digit: String
+    let fontName: String
     @State private var previousDigit: String = ""
     @State private var topRotation: Double = 0
     @State private var bottomRotation: Double = 0
@@ -15,14 +17,14 @@ struct WidgetFlipDigitView: View {
             // Top half
             ZStack {
                 Text(previousDigit)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .font(.custom(fontName, size: 60))
                     .frame(width: 40, height: 30)
                     .foregroundStyle(.primary)
                     .background(.ultraThinMaterial)
                     .clipped()
 
                 Text(digit)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .font(.custom(fontName, size: 60))
                     .frame(width: 40, height: 30)
                     .foregroundStyle(.primary)
                     .background(.ultraThinMaterial)
@@ -41,7 +43,7 @@ struct WidgetFlipDigitView: View {
             // Bottom half
             ZStack {
                 Text(previousDigit)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .font(.custom(fontName, size: 60))
                     .frame(width: 40, height: 30)
                     .foregroundStyle(.primary)
                     .background(.ultraThinMaterial)
@@ -49,7 +51,7 @@ struct WidgetFlipDigitView: View {
                     .opacity(bottomRotation >= 90 ? 1 : 0)
 
                 Text(digit)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .font(.custom(fontName, size: 60))
                     .frame(width: 40, height: 30)
                     .foregroundStyle(.primary)
                     .background(.ultraThinMaterial)
@@ -84,6 +86,7 @@ struct ClockWeatherEntry: TimelineEntry {
     let city: String
     let hour: String
     let minute: String
+    let fontName: String
 }
 
 struct ClockWeatherProvider: TimelineProvider {
@@ -101,7 +104,8 @@ struct ClockWeatherProvider: TimelineProvider {
             condition: "Sunny",
             city: "San Francisco",
             hour: time.hour,
-            minute: time.minute
+            minute: time.minute,
+            fontName: UIFont.systemFont(ofSize: 17).familyName
         )
     }
 
@@ -115,6 +119,7 @@ struct ClockWeatherProvider: TimelineProvider {
         let temp = defaults?.string(forKey: "temperature") ?? "--°"
         let cond = defaults?.string(forKey: "condition") ?? "Updating..."
         let city = defaults?.string(forKey: "city") ?? "Location..."
+        let font = defaults?.string(forKey: "fontName") ?? UIFont.systemFont(ofSize: 17).familyName
 
         let entry = ClockWeatherEntry(
             date: Date(),
@@ -122,7 +127,8 @@ struct ClockWeatherProvider: TimelineProvider {
             condition: cond,
             city: city,
             hour: time.hour,
-            minute: time.minute
+            minute: time.minute,
+            fontName: font
         )
         let nextUpdate = Calendar.current.date(byAdding: .minute, value: 1, to: Date())!
         completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
@@ -144,14 +150,14 @@ struct ClockWeatherWidgetEntryView: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 6) {
-                WidgetFlipDigitView(digit: entry.hour)
-                WidgetFlipDigitView(digit: entry.minute)
+                WidgetFlipDigitView(digit: entry.hour, fontName: entry.fontName)
+                WidgetFlipDigitView(digit: entry.minute, fontName: entry.fontName)
             }
 
             VStack(alignment: .leading) {
-                Text(entry.city).font(.caption)
-                Text(entry.condition).font(.caption2)
-                Text(entry.temperature).font(.title2).bold()
+                Text(entry.city).font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption1).pointSize))
+                Text(entry.condition).font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption2).pointSize))
+                Text(entry.temperature).font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .title2).pointSize)).bold()
             }
         }
         .padding()

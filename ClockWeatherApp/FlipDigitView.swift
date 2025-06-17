@@ -1,9 +1,12 @@
 
 import SwiftUI
+import UIKit
 
 struct FlipDigitView: View {
     /// The digit currently being displayed.
     let digit: String
+    /// Font name to render the digit in
+    let fontName: String
 
     /// The digit that was previously shown. Used for the flip animation.
     @State private var previousDigit: String = ""
@@ -17,14 +20,14 @@ struct FlipDigitView: View {
             // Top half
             ZStack {
                 Text(previousDigit)
-                    .font(.system(size: 60, weight: .bold, design: .rounded))
+                    .font(.custom(fontName, size: 100))
                     .frame(width: 80, height: 50)
                     .foregroundStyle(.primary)
                     .background(.ultraThinMaterial)
                     .clipped()
 
                 Text(digit)
-                    .font(.system(size: 60, weight: .bold, design: .rounded))
+                    .font(.custom(fontName, size: 100))
                     .frame(width: 80, height: 50)
                     .foregroundStyle(.primary)
                     .background(.ultraThinMaterial)
@@ -43,7 +46,7 @@ struct FlipDigitView: View {
             // Bottom half
             ZStack {
                 Text(previousDigit)
-                    .font(.system(size: 60, weight: .bold, design: .rounded))
+                    .font(.custom(fontName, size: 100))
                     .frame(width: 80, height: 50)
                     .foregroundStyle(.primary)
                     .background(.ultraThinMaterial)
@@ -51,7 +54,7 @@ struct FlipDigitView: View {
                     .opacity(bottomRotation >= 90 ? 1 : 0)
 
                 Text(digit)
-                    .font(.system(size: 60, weight: .bold, design: .rounded))
+                    .font(.custom(fontName, size: 100))
                     .frame(width: 80, height: 50)
                     .foregroundStyle(.primary)
                     .background(.ultraThinMaterial)
