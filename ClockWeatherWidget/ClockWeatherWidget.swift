@@ -3,65 +3,71 @@ import SwiftUI
 import Foundation
 import UIKit
 
-/// Simplified flip digit view for the widget. This avoids needing to share
-/// sources between targets while still providing the flip animation.
+/// Flip digit view for the widget that mirrors the design used in the main app.
+struct WidgetDigitHalfView: View {
+    let digit: String
+    let fontName: String
+    let clipTop: Bool
+
+    var body: some View {
+        GeometryReader { geo in
+            let size = geo.size
+            let halfHeight = size.height / 2
+
+            Text(digit)
+                .font(.custom(fontName, size: size.height * 1.5))
+                .foregroundStyle(.white)
+                .frame(width: size.width, height: size.height)
+                .lineLimit(1)
+                .minimumScaleFactor(0.1)
+                .background(Color.black)
+                .mask(
+                    Rectangle()
+                        .frame(width: size.width, height: halfHeight)
+                        .offset(y: clipTop ? -halfHeight / 2 : halfHeight / 2)
+                )
+        }
+        .clipped()
+    }
+}
+
+/// Flip digit view used by the widget.
 struct WidgetFlipDigitView: View {
     let digit: String
     let fontName: String
+
     @State private var previousDigit: String = ""
     @State private var topRotation: Double = 0
     @State private var bottomRotation: Double = 0
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Top half
-            ZStack {
-                Text(previousDigit)
-                    .font(.custom(fontName, size: 60))
-                    .frame(width: 40, height: 30)
-                    .foregroundStyle(.primary)
-                    .background(.ultraThinMaterial)
-                    .clipped()
+        GeometryReader { geo in
+            let halfHeight = geo.size.height / 2
+            let width = geo.size.width
 
-                Text(digit)
-                    .font(.custom(fontName, size: 60))
-                    .frame(width: 40, height: 30)
-                    .foregroundStyle(.primary)
-                    .background(.ultraThinMaterial)
-                    .clipped()
-                    .opacity(topRotation <= -90 ? 1 : 0)
+            VStack(spacing: 0) {
+                ZStack {
+                    WidgetDigitHalfView(digit: previousDigit, fontName: fontName, clipTop: true)
+                    WidgetDigitHalfView(digit: digit, fontName: fontName, clipTop: true)
+                        .rotation3DEffect(.degrees(topRotation), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
+                        .opacity(topRotation != 0 ? 1 : 0)
+                }
+                .frame(width: width, height: halfHeight)
+
+                ZStack {
+                    WidgetDigitHalfView(digit: digit, fontName: fontName, clipTop: false)
+                        .opacity(bottomRotation == 0 ? 1 : 0)
+                    WidgetDigitHalfView(digit: previousDigit, fontName: fontName, clipTop: false)
+                        .rotation3DEffect(.degrees(bottomRotation), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
+                        .opacity(bottomRotation != 0 ? 1 : 0)
+                }
+                .frame(width: width, height: halfHeight)
             }
-            .overlay(
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(.gray.opacity(0.4)),
-                alignment: .bottom
-            )
-            .rotation3DEffect(.degrees(topRotation), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
-            .clipped()
-
-            // Bottom half
-            ZStack {
-                Text(previousDigit)
-                    .font(.custom(fontName, size: 60))
-                    .frame(width: 40, height: 30)
-                    .foregroundStyle(.primary)
-                    .background(.ultraThinMaterial)
-                    .clipped()
-                    .opacity(bottomRotation >= 90 ? 1 : 0)
-
-                Text(digit)
-                    .font(.custom(fontName, size: 60))
-                    .frame(width: 40, height: 30)
-                    .foregroundStyle(.primary)
-                    .background(.ultraThinMaterial)
-                    .clipped()
-                    .opacity(bottomRotation < 90 ? 1 : 0)
-            }
-            .rotation3DEffect(.degrees(bottomRotation), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
-            .clipped()
+            .frame(width: width, height: geo.size.height)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .aspectRatio(0.6, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
         .onAppear { previousDigit = digit }
         .onChange(of: digit) { _, newValue in
             withAnimation(.easeInOut(duration: 0.25)) {
@@ -150,8 +156,18 @@ struct ClockWeatherWidgetEntryView: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 6) {
-                WidgetFlipDigitView(digit: entry.hour, fontName: entry.fontName)
-                WidgetFlipDigitView(digit: entry.minute, fontName: entry.fontName)
+                ForEach(Array(entry.hour), id: \.self) { char in
+                    WidgetFlipDigitView(digit: String(char), fontName: entry.fontName)
+                }
+
+                Text(":")
+                    .font(.system(size: 40, weight: .bold, design: .monospaced))
+                    .foregroundStyle(.white)
+                    .offset(y: -8)
+
+                ForEach(Array(entry.minute), id: \.self) { char in
+                    WidgetFlipDigitView(digit: String(char), fontName: entry.fontName)
+                }
             }
 
             VStack(alignment: .leading) {
