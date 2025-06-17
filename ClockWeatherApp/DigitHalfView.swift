@@ -6,8 +6,6 @@
 //
 import SwiftUI
 
-import SwiftUI
-
 struct DigitHalfView: View {
     let digit: String
     let fontName: String

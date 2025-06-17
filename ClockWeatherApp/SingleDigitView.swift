@@ -5,6 +5,7 @@
 //  Created by Mark Mayne on 6/17/25.
 //
 
+import SwiftUI
 
 struct SingleDigitView: View {
     let text: String
