@@ -1,82 +1,50 @@
-
 import SwiftUI
-import UIKit
 
 struct FlipDigitView: View {
-    /// The digit currently being displayed.
     let digit: String
-    /// Font name to render the digit in
     let fontName: String
 
-    /// The digit that was previously shown. Used for the flip animation.
     @State private var previousDigit: String = ""
-
-    /// Rotation amounts for the top and bottom halves of the card.
     @State private var topRotation: Double = 0
     @State private var bottomRotation: Double = 0
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Top half
-            ZStack {
-                Text(previousDigit)
-                    .font(.custom(fontName, size: 100))
-                    .frame(width: 80, height: 50)
-                    .foregroundStyle(.primary)
-                    .background(.ultraThinMaterial)
-                    .clipped()
+        GeometryReader { geo in
+            let halfHeight = geo.size.height / 2
+            let width = geo.size.width
 
-                Text(digit)
-                    .font(.custom(fontName, size: 100))
-                    .frame(width: 80, height: 50)
-                    .foregroundStyle(.primary)
-                    .background(.ultraThinMaterial)
-                    .clipped()
-                    .opacity(topRotation <= -90 ? 1 : 0)
+            VStack(spacing: 0) {
+                ZStack {
+                    DigitHalfView(digit: previousDigit, fontName: fontName, clipTop: true)
+                    DigitHalfView(digit: digit, fontName: fontName, clipTop: true)
+                        .rotation3DEffect(.degrees(topRotation), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
+                        .opacity(topRotation != 0 ? 1 : 0)
+                }
+                .frame(width: width, height: halfHeight)
+
+                ZStack {
+                    DigitHalfView(digit: digit, fontName: fontName, clipTop: false)
+                        .opacity(bottomRotation == 0 ? 1 : 0)
+                    DigitHalfView(digit: previousDigit, fontName: fontName, clipTop: false)
+                        .rotation3DEffect(.degrees(bottomRotation), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
+                        .opacity(bottomRotation != 0 ? 1 : 0)
+                }
+                .frame(width: width, height: halfHeight)
             }
-            .overlay(
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(.gray.opacity(0.4)),
-                alignment: .bottom
-            )
-            .rotation3DEffect(.degrees(topRotation), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
-            .clipped()
-
-            // Bottom half
-            ZStack {
-                Text(previousDigit)
-                    .font(.custom(fontName, size: 100))
-                    .frame(width: 80, height: 50)
-                    .foregroundStyle(.primary)
-                    .background(.ultraThinMaterial)
-                    .clipped()
-                    .opacity(bottomRotation >= 90 ? 1 : 0)
-
-                Text(digit)
-                    .font(.custom(fontName, size: 100))
-                    .frame(width: 80, height: 50)
-                    .foregroundStyle(.primary)
-                    .background(.ultraThinMaterial)
-                    .clipped()
-                    .opacity(bottomRotation < 90 ? 1 : 0)
-            }
-            .rotation3DEffect(.degrees(bottomRotation), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
-            .clipped()
+            .frame(width: width, height: geo.size.height)
         }
+        .aspectRatio(0.6, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+        .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
         .onAppear { previousDigit = digit }
-        .onChange(of: digit) { _, newValue in
-            // First flip the top half away
+        .onChange(of: digit) { _, newDigit in
             withAnimation(.easeInOut(duration: 0.25)) {
                 topRotation = -90
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                previousDigit = newValue
+                previousDigit = newDigit
                 topRotation = 0
                 bottomRotation = 90
-                // Then flip the bottom half in
                 withAnimation(.easeInOut(duration: 0.25)) {
                     bottomRotation = 0
                 }
