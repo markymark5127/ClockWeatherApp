@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import Foundation
 
 /// Simplified flip digit view for the widget. This avoids needing to share
 /// sources between targets while still providing the flip animation.
@@ -78,8 +79,10 @@ struct ClockWeatherProvider: TimelineProvider {
     }
 
     func getCurrentTime() -> (hour: String, minute: String) {
+        let defaults = UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp")
+        let format = defaults?.string(forKey: "timeFormat") ?? "24hr"
         let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
+        formatter.dateFormat = format == "12hr" ? "hh:mm" : "HH:mm"
         let time = formatter.string(from: Date()).split(separator: ":")
         return (String(time[0]), String(time[1]))
     }
