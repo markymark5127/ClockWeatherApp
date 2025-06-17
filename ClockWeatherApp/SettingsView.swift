@@ -2,9 +2,9 @@ import SwiftUI
 import WidgetKit
 
 struct SettingsView: View {
-    @AppStorage("unit", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    @AppStorage("unit", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
     private var unit: String = "fahrenheit"
-    @AppStorage("timeFormat", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    @AppStorage("timeFormat", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
     private var timeFormat: String = "24hr"
     @State private var cityName: String = ""
     @ObservedObject var weather: WeatherFetcher

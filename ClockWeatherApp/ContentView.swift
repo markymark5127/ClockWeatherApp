@@ -14,7 +14,7 @@ struct ContentView: View {
     @StateObject var weather = WeatherFetcher()
     @StateObject var locationManager = LocationManager()
     @State private var showSettings = false
-    @AppStorage("timeFormat", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    @AppStorage("timeFormat", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
     private var timeFormat: String = "24hr"
 
     var body: some View {
@@ -49,7 +49,7 @@ struct ContentView: View {
 }
 
 func getCurrentTime() -> (hour: String, minute: String) {
-    let defaults = UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp")
+    let defaults = UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
     let format = defaults?.string(forKey: "timeFormat") ?? "24hr"
     let formatter = DateFormatter()
     formatter.dateFormat = format == "12hr" ? "hh:mm" : "HH:mm"
