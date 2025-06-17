@@ -1,5 +1,6 @@
 import SwiftUI
 import WidgetKit
+import UIKit
 
 struct SettingsView: View {
     @AppStorage("unit", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
@@ -8,6 +9,8 @@ struct SettingsView: View {
     private var timeFormat: String = "24hr"
     @AppStorage("locationMode", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
     private var locationMode: String = "currentlocation"
+    @AppStorage("fontName", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
+    private var fontName: String = UIFont.systemFont(ofSize: 17).familyName
     @State private var cityName: String = ""
     @ObservedObject var weather: WeatherFetcher
 
@@ -49,6 +52,17 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.segmented)
                     .onChange(of: timeFormat) { _, _ in
+                        WidgetCenter.shared.reloadAllTimelines()
+                    }
+                }
+
+                Section("Font") {
+                    Picker("Font", selection: $fontName) {
+                        ForEach(UIFont.familyNames.sorted(), id: \\.self) { name in
+                            Text(name).font(.custom(name, size: 16)).tag(name)
+                        }
+                    }
+                    .onChange(of: fontName) { _, _ in
                         WidgetCenter.shared.reloadAllTimelines()
                     }
                 }
