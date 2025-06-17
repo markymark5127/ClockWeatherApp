@@ -61,6 +61,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E709FD152E020BBA00FED274 /* Exceptions for "ClockWeatherApp" folder in "ClockWeatherApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SingleDigitView.swift,
+			);
+			target = E7EC41022E003A0F008C76D7 /* ClockWeatherApp */;
+		};
+		E709FD162E020BBA00FED274 /* Exceptions for "ClockWeatherApp" folder in "ClockWeatherWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SingleDigitView.swift,
+			);
+			target = E7EC41542E003B6F008C76D7 /* ClockWeatherWidgetExtension */;
+		};
 		E7EC41692E003B72008C76D7 /* Exceptions for "ClockWeatherWidget" folder in "ClockWeatherWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -73,6 +87,10 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E7EC41052E003A0F008C76D7 /* ClockWeatherApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E709FD152E020BBA00FED274 /* Exceptions for "ClockWeatherApp" folder in "ClockWeatherApp" target */,
+				E709FD162E020BBA00FED274 /* Exceptions for "ClockWeatherApp" folder in "ClockWeatherWidgetExtension" target */,
+			);
 			path = ClockWeatherApp;
 			sourceTree = "<group>";
 		};

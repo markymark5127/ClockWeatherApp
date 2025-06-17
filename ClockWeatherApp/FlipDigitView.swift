@@ -5,48 +5,47 @@ struct FlipDigitView: View {
     let fontName: String
 
     @State private var previousDigit: String = ""
-    @State private var topRotation: Double = 0
-    @State private var bottomRotation: Double = 0
+    @State private var animateTop = false
+    @State private var animateBottom = false
 
     var body: some View {
-        GeometryReader { geo in
-            let halfHeight = geo.size.height / 2
-            let width = geo.size.width
-
-            VStack(spacing: 0) {
-                ZStack {
-                    DigitHalfView(digit: previousDigit, fontName: fontName, clipTop: true)
-                    DigitHalfView(digit: digit, fontName: fontName, clipTop: true)
-                        .rotation3DEffect(.degrees(topRotation), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
-                        .opacity(topRotation != 0 ? 1 : 0)
-                }
-                .frame(width: width, height: halfHeight)
-
-                ZStack {
-                    DigitHalfView(digit: digit, fontName: fontName, clipTop: false)
-                        .opacity(bottomRotation == 0 ? 1 : 0)
-                    DigitHalfView(digit: previousDigit, fontName: fontName, clipTop: false)
-                        .rotation3DEffect(.degrees(bottomRotation), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
-                        .opacity(bottomRotation != 0 ? 1 : 0)
-                }
-                .frame(width: width, height: halfHeight)
+        VStack(spacing: 0) {
+            ZStack {
+                SingleDigitView(text: digit, fontName: fontName, type: .top)
+                SingleDigitView(text: previousDigit, fontName: fontName, type: .top)
+                    .rotation3DEffect(.degrees(animateTop ? -90 : 0),
+                                      axis: (x: 1, y: 0, z: 0),
+                                      anchor: .bottom,
+                                      perspective: 0.5)
             }
-            .frame(width: width, height: geo.size.height)
+            .clipped()
+
+            Rectangle()
+                .fill(Color.gray.opacity(0.4))
+                .frame(height: 1)
+
+            ZStack {
+                SingleDigitView(text: previousDigit, fontName: fontName, type: .bottom)
+                SingleDigitView(text: digit, fontName: fontName, type: .bottom)
+                    .rotation3DEffect(.degrees(animateBottom ? 0 : 90),
+                                      axis: (x: 1, y: 0, z: 0),
+                                      anchor: .top,
+                                      perspective: 0.5)
+            }
+            .clipped()
         }
-        .aspectRatio(0.6, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
+        .fixedSize()
         .onAppear { previousDigit = digit }
-        .onChange(of: digit) { _, newDigit in
+        .onChange(of: digit) { _, newValue in
             withAnimation(.easeInOut(duration: 0.25)) {
-                topRotation = -90
+                animateTop = true
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                previousDigit = newDigit
-                topRotation = 0
-                bottomRotation = 90
+                previousDigit = newValue
+                animateTop = false
+                animateBottom = false
                 withAnimation(.easeInOut(duration: 0.25)) {
-                    bottomRotation = 0
+                    animateBottom = true
                 }
             }
         }

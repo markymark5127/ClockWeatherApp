@@ -4,6 +4,7 @@ import Foundation
 import UIKit
 
 /// Flip digit view for the widget that mirrors the design used in the main app.
+
 struct WidgetDigitHalfView: View {
     let digit: String
     let fontName: String
@@ -11,25 +12,31 @@ struct WidgetDigitHalfView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let size = geo.size
-            let halfHeight = size.height / 2
+            let height = geo.size.height
+            let width = geo.size.width
+            let halfHeight = height / 2
 
-            Text(digit)
-                .font(.custom(fontName, size: size.height * 1.5))
-                .foregroundStyle(.white)
-                .frame(width: size.width, height: size.height)
-                .lineLimit(1)
-                .minimumScaleFactor(0.1)
-                .background(Color.black)
-                .mask(
-                    Rectangle()
-                        .frame(width: size.width, height: halfHeight)
-                        .offset(y: clipTop ? -halfHeight / 2 : halfHeight / 2)
-                )
+            ZStack(alignment: .top) {
+                Text(digit)
+                    .font(.custom(fontName, size: height * 1.4))
+                    .frame(width: width, height: height * 1.4)
+                    .minimumScaleFactor(0.1)
+                    .lineLimit(1)
+                    .foregroundStyle(.white)
+                    .background(Color.black)
+            }
+            .frame(width: width, height: halfHeight, alignment: clipTop ? .top : .bottom)
+            .clipped()
         }
-        .clipped()
     }
 }
+
+
+
+
+
+
+
 
 /// Flip digit view used by the widget.
 struct WidgetFlipDigitView: View {
@@ -156,8 +163,8 @@ struct ClockWeatherWidgetEntryView: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 6) {
-                ForEach(Array(entry.hour), id: \.self) { char in
-                    WidgetFlipDigitView(digit: String(char), fontName: entry.fontName)
+                ForEach(Array(entry.hour.map { String($0) }), id: \.self) { digit in
+                    WidgetFlipDigitView(digit: digit, fontName: entry.fontName)
                 }
 
                 Text(":")
@@ -165,8 +172,8 @@ struct ClockWeatherWidgetEntryView: View {
                     .foregroundStyle(.white)
                     .offset(y: -8)
 
-                ForEach(Array(entry.minute), id: \.self) { char in
-                    WidgetFlipDigitView(digit: String(char), fontName: entry.fontName)
+                ForEach(Array(entry.minute.map { String($0) }), id: \.self) { digit in
+                    WidgetFlipDigitView(digit: digit, fontName: entry.fontName)
                 }
             }
 
