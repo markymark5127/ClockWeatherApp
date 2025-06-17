@@ -5,6 +5,8 @@
 //  Created by Mark Mayne on 6/17/25.
 //
 
+import SwiftUI
+import Foundation
 
 struct FlipClockView: View {
     @State private var currentTime: (hour: String, minute: String) = ("--", "--")
