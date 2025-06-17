@@ -42,7 +42,11 @@ struct ClockWeatherEntry: TimelineEntry {
 }
 
 struct ClockWeatherProvider: TimelineProvider {
-    let sharedDefaults = UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
+
+    private func sharedDefaults() -> UserDefaults? {
+        guard ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else { return nil }
+        return UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
+    }
 
     func placeholder(in context: Context) -> ClockWeatherEntry {
         let time = getCurrentTime()
@@ -62,9 +66,10 @@ struct ClockWeatherProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<ClockWeatherEntry>) -> Void) {
         let time = getCurrentTime()
-        let temp = sharedDefaults?.string(forKey: "temperature") ?? "--°"
-        let cond = sharedDefaults?.string(forKey: "condition") ?? "Updating..."
-        let city = sharedDefaults?.string(forKey: "city") ?? "Location..."
+        let defaults = sharedDefaults()
+        let temp = defaults?.string(forKey: "temperature") ?? "--°"
+        let cond = defaults?.string(forKey: "condition") ?? "Updating..."
+        let city = defaults?.string(forKey: "city") ?? "Location..."
 
         let entry = ClockWeatherEntry(
             date: Date(),
@@ -79,7 +84,7 @@ struct ClockWeatherProvider: TimelineProvider {
     }
 
     func getCurrentTime() -> (hour: String, minute: String) {
-        let defaults = UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
+        let defaults = sharedDefaults()
         let format = defaults?.string(forKey: "timeFormat") ?? "24hr"
         let formatter = DateFormatter()
         formatter.dateFormat = format == "12hr" ? "hh:mm" : "HH:mm"

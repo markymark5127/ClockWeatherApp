@@ -22,7 +22,10 @@ class WeatherFetcher: ObservableObject {
 
     private var lastCoordinates: CLLocationCoordinate2D?
 
-    let sharedDefaults = UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
+    private func sharedDefaults() -> UserDefaults? {
+        guard ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else { return nil }
+        return UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
+    }
 
     func fetchWeather(lat: Double, lon: Double) {
         lastCoordinates = CLLocationCoordinate2D(latitude: lat, longitude: lon)
@@ -47,12 +50,13 @@ class WeatherFetcher: ObservableObject {
                 self.temperature = temp
                 self.condition = desc
 
-                self.sharedDefaults?.setValue(temp, forKey: "temperature")
-                self.sharedDefaults?.setValue(desc, forKey: "condition")
-                self.sharedDefaults?.setValue(self.unit, forKey: "unit")
-                self.sharedDefaults?.setValue(self.lastCoordinates?.latitude, forKey: "lat")
-                self.sharedDefaults?.setValue(self.lastCoordinates?.longitude, forKey: "lon")
-                self.sharedDefaults?.setValue(Date(), forKey: "lastUpdated")
+                let defaults = self.sharedDefaults()
+                defaults?.setValue(temp, forKey: "temperature")
+                defaults?.setValue(desc, forKey: "condition")
+                defaults?.setValue(self.unit, forKey: "unit")
+                defaults?.setValue(self.lastCoordinates?.latitude, forKey: "lat")
+                defaults?.setValue(self.lastCoordinates?.longitude, forKey: "lon")
+                defaults?.setValue(Date(), forKey: "lastUpdated")
                 WidgetCenter.shared.reloadAllTimelines()
             }
         }.resume()
@@ -62,7 +66,7 @@ class WeatherFetcher: ObservableObject {
             if let city = placemarks?.first?.locality {
                 DispatchQueue.main.async {
                     self.city = city
-                    self.sharedDefaults?.setValue(city, forKey: "city")
+                    self.sharedDefaults()?.setValue(city, forKey: "city")
                 }
             }
         }

@@ -10,7 +10,7 @@ import CoreLocation
 import WidgetKit
 
 struct ContentView: View {
-    @State private var time = getCurrentTime()
+    @State private var time: (hour: String, minute: String) = ("--", "--")
     @StateObject var weather = WeatherFetcher()
     @StateObject var locationManager = LocationManager()
     @State private var showSettings = false
@@ -32,6 +32,7 @@ struct ContentView: View {
             Button("Settings") { showSettings = true }
         }
         .onAppear {
+            self.time = getCurrentTime()
             Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
                 self.time = getCurrentTime()
             }
@@ -51,8 +52,14 @@ struct ContentView: View {
 }
 
 func getCurrentTime() -> (hour: String, minute: String) {
-    let defaults = UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
-    let format = defaults?.string(forKey: "timeFormat") ?? "24hr"
+    var format = "24hr"
+    if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" {
+        if let defaults = UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp") {
+            format = defaults.string(forKey: "timeFormat") ?? "24hr"
+        } else {
+            print("❌ Couldn't load shared UserDefaults")
+        }
+    }
     let formatter = DateFormatter()
     formatter.dateFormat = format == "12hr" ? "hh:mm" : "HH:mm"
     let time = formatter.string(from: Date()).split(separator: ":")
