@@ -58,7 +58,7 @@ struct SettingsView: View {
 
                 Section("Font") {
                     Picker("Font", selection: $fontName) {
-                        ForEach(UIFont.familyNames.sorted(), id: \\.self) { name in
+                        ForEach(UIFont.familyNames.sorted(), id: \.self) { name in
                             Text(name).font(.custom(name, size: 16)).tag(name)
                         }
                     }
