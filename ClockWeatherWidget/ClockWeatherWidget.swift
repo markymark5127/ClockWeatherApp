@@ -42,7 +42,7 @@ struct ClockWeatherEntry: TimelineEntry {
 }
 
 struct ClockWeatherProvider: TimelineProvider {
-    let sharedDefaults = UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp")
+    let sharedDefaults = UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
 
     func placeholder(in context: Context) -> ClockWeatherEntry {
         let time = getCurrentTime()
@@ -79,7 +79,7 @@ struct ClockWeatherProvider: TimelineProvider {
     }
 
     func getCurrentTime() -> (hour: String, minute: String) {
-        let defaults = UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp")
+        let defaults = UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
         let format = defaults?.string(forKey: "timeFormat") ?? "24hr"
         let formatter = DateFormatter()
         formatter.dateFormat = format == "12hr" ? "hh:mm" : "HH:mm"

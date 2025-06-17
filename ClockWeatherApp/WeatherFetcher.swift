@@ -17,12 +17,12 @@ class WeatherFetcher: ObservableObject {
     @Published var temperature: String = "--"
     @Published var condition: String = "Loading..."
     @Published var city: String = "Locating..."
-    @AppStorage("unit", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    @AppStorage("unit", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
     var unit: String = "fahrenheit"
 
     private var lastCoordinates: CLLocationCoordinate2D?
 
-    let sharedDefaults = UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp")
+    let sharedDefaults = UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp")
 
     func fetchWeather(lat: Double, lon: Double) {
         lastCoordinates = CLLocationCoordinate2D(latitude: lat, longitude: lon)
