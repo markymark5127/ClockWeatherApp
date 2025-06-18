@@ -215,7 +215,7 @@ struct ClockWeatherWidgetEntryView: View {
                 WidgetFlipDigitView(digit: entry.hour, fontName: entry.fontName)
                 WidgetFlipDigitView(digit: entry.minute, fontName: entry.fontName)
             }
-            .frame(height: 120)
+            .frame(height: 100)
 
             HStack {
                 VStack(alignment: .leading) {
@@ -224,13 +224,6 @@ struct ClockWeatherWidgetEntryView: View {
                     Text(entry.condition)
                         .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption2).pointSize))
                 }
-
-                Spacer()
-
-                Image(systemName: entry.iconName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 24)
 
                 Spacer()
 
@@ -249,8 +242,16 @@ struct ClockWeatherWidgetEntryView: View {
                     }
                 }
             }
+            .overlay(
+                Image(systemName: entry.iconName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 24),
+                alignment: .center
+            )
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.vertical, 8)
         .containerBackground(Color.clear, for: .widget)
     }
 }
