@@ -98,6 +98,9 @@ struct ClockWeatherEntry: TimelineEntry {
     let temperature: String
     let condition: String
     let city: String
+    let iconName: String
+    let highTemp: String
+    let lowTemp: String
     let hour: String
     let minute: String
     let fontName: String
@@ -117,6 +120,9 @@ struct ClockWeatherProvider: TimelineProvider {
             temperature: "72°",
             condition: "Sunny",
             city: "San Francisco",
+            iconName: "sun.max",
+            highTemp: "75°",
+            lowTemp: "55°",
             hour: time.hour,
             minute: time.minute,
             fontName: UIFont.systemFont(ofSize: 17).familyName
@@ -133,6 +139,14 @@ struct ClockWeatherProvider: TimelineProvider {
         let temp = defaults?.string(forKey: "temperature") ?? "--°"
         let cond = defaults?.string(forKey: "condition") ?? "Updating..."
         let city = defaults?.string(forKey: "city") ?? "Location..."
+        let icon = defaults?.string(forKey: "iconName") ?? {
+            if let code = defaults?.integer(forKey: "weathercode") as Int? {
+                return Self.iconName(for: code)
+            }
+            return "questionmark"
+        }()
+        let high = defaults?.string(forKey: "highTemp") ?? "--"
+        let low = defaults?.string(forKey: "lowTemp") ?? "--"
         let font = defaults?.string(forKey: "fontName") ?? UIFont.systemFont(ofSize: 17).familyName
 
         let entry = ClockWeatherEntry(
@@ -140,6 +154,9 @@ struct ClockWeatherProvider: TimelineProvider {
             temperature: temp,
             condition: cond,
             city: city,
+            iconName: icon,
+            highTemp: high,
+            lowTemp: low,
             hour: time.hour,
             minute: time.minute,
             fontName: font
@@ -156,6 +173,37 @@ struct ClockWeatherProvider: TimelineProvider {
         let time = formatter.string(from: Date()).split(separator: ":")
         return (String(time[0]), String(time[1]))
     }
+
+    static func iconName(for code: Int) -> String {
+        switch code {
+        case 0, 1:
+            return "sun.max"
+        case 2:
+            return "cloud.sun"
+        case 3:
+            return "cloud"
+        case 45, 48:
+            return "cloud.fog"
+        case 51, 53, 55:
+            return "cloud.drizzle"
+        case 56, 57:
+            return "cloud.sleet"
+        case 61, 63, 65:
+            return "cloud.rain"
+        case 66, 67:
+            return "cloud.sleet"
+        case 71, 73, 75, 77:
+            return "cloud.snow"
+        case 80, 81, 82:
+            return "cloud.heavyrain"
+        case 85, 86:
+            return "cloud.snow"
+        case 95, 96, 99:
+            return "cloud.bolt"
+        default:
+            return "questionmark"
+        }
+    }
 }
 
 struct ClockWeatherWidgetEntryView: View {
@@ -169,10 +217,37 @@ struct ClockWeatherWidgetEntryView: View {
             }
             .frame(height: 120)
 
-            VStack(alignment: .leading) {
-                Text(entry.city).font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption1).pointSize))
-                Text(entry.condition).font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption2).pointSize))
-                Text(entry.temperature).font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .title2).pointSize)).bold()
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(entry.city)
+                        .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption1).pointSize))
+                    Text(entry.condition)
+                        .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption2).pointSize))
+                }
+
+                Spacer()
+
+                Image(systemName: entry.iconName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 24)
+
+                Spacer()
+
+                VStack(alignment: .trailing) {
+                    Text(entry.date, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day())
+                        .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption1).pointSize))
+                    HStack(alignment: .center, spacing: 4) {
+                        Text(entry.temperature)
+                            .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .title2).pointSize))
+                            .bold()
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text("H: \(entry.highTemp)")
+                            Text("L: \(entry.lowTemp)")
+                        }
+                        .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption2).pointSize))
+                    }
+                }
             }
         }
         .padding()
