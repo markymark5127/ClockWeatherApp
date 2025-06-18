@@ -15,7 +15,7 @@ struct SingleDigitView: View {
     var height: CGFloat = 40
 
     var body: some View {
-        let width = CGFloat(height * max(1, text.count))
+        let width = height * CGFloat( max(1, text.count))
         DigitHalfView(digit: text, fontName: fontName, clipTop: type == .top)
             .frame(width: width, height: height)
             .background(Color.black)
