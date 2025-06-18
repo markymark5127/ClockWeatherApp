@@ -159,7 +159,8 @@ struct ClockWeatherWidgetEntryView: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 6) {
-                ForEach(Array(entry.hour.map { String($0) }), id: \.self) { digit in
+                ForEach(Array(entry.hour.enumerated()), id: \.offset) { _, ch in
+                    let digit = String(ch)
                     WidgetFlipDigitView(digit: digit, fontName: entry.fontName)
                 }
 
@@ -168,7 +169,8 @@ struct ClockWeatherWidgetEntryView: View {
                     .foregroundStyle(.white)
                     .offset(y: -8)
 
-                ForEach(Array(entry.minute.map { String($0) }), id: \.self) { digit in
+                ForEach(Array(entry.minute.enumerated()), id: \.offset) { _, ch in
+                    let digit = String(ch)
                     WidgetFlipDigitView(digit: digit, fontName: entry.fontName)
                 }
             }
