@@ -8,23 +8,24 @@ struct WidgetSingleDigitView: View {
     let text: String
     let fontName: String
     let type: FlipType
+    var height: CGFloat = 40
 
     var body: some View {
-        let width = CGFloat(40 * max(1, text.count))
-        let fontSize: CGFloat = 60
+        let width = CGFloat(height * max(1, text.count))
+        let fontSize: CGFloat = height * 1.5
         let font = UIFont(name: fontName, size: fontSize) ?? .systemFont(ofSize: fontSize)
         let sample = ("8" as NSString).size(withAttributes: [.font: font])
-        let offset = (40 - sample.height) / 2
+        let offset = (height - sample.height) / 2
         Text(text)
             .font(.custom(fontName, size: fontSize))
             .offset(y: offset)
             .foregroundColor(.black)
-            .frame(width: width, height: 40, alignment: type.alignment)
-            .padding(type.padding, -8)
+            .frame(width: width, height: height, alignment: type.alignment)
+            .padding(type.padding, -height / 5)
             .clipped()
             .background(Color.white)
-            .cornerRadius(8)
-            .padding(type.padding, -4)
+            .cornerRadius(height / 5)
+            .padding(type.padding, -height / 10)
     }
 
     enum FlipType {
@@ -46,6 +47,7 @@ struct WidgetSingleDigitView: View {
 struct WidgetFlipDigitView: View {
     let digit: String
     let fontName: String
+    var height: CGFloat = 40
 
     @State private var previousDigit: String = ""
     @State private var animateTop = false
@@ -54,8 +56,8 @@ struct WidgetFlipDigitView: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top)
-                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top)
+                WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top, height: height)
+                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top, height: height)
                     .rotation3DEffect(.degrees(animateTop ? -90 : 0),
                                       axis: (x: 1, y: 0, z: 0),
                                       anchor: .bottom,
@@ -68,8 +70,8 @@ struct WidgetFlipDigitView: View {
             .frame(height: 1)
 
         ZStack {
-            WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
-            WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
+            WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom, height: height)
+            WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom, height: height)
                 .rotation3DEffect(.degrees(animateBottom ? 0 : 90),
                                   axis: (x: 1, y: 0, z: 0),
                                   anchor: .top,
@@ -220,15 +222,25 @@ struct ClockWeatherProvider: TimelineProvider {
 }
 
 struct ClockWeatherWidgetEntryView: View {
+    @Environment(\.widgetFamily) private var family
     var entry: ClockWeatherEntry
 
     var body: some View {
+        let digitHeight: CGFloat = {
+            switch family {
+            case .systemLarge, .systemExtraLarge:
+                return 80
+            default:
+                return 40
+            }
+        }()
+
         VStack(spacing: 12) {
             HStack(spacing: 8) {
-                WidgetFlipDigitView(digit: entry.hour, fontName: entry.fontName)
-                WidgetFlipDigitView(digit: entry.minute, fontName: entry.fontName)
+                WidgetFlipDigitView(digit: entry.hour, fontName: entry.fontName, height: digitHeight)
+                WidgetFlipDigitView(digit: entry.minute, fontName: entry.fontName, height: digitHeight)
             }
-            .frame(height: 100)
+            .frame(height: digitHeight * 2)
 
             HStack {
                 VStack(alignment: .leading) {
@@ -278,6 +290,6 @@ struct ClockWeatherWidget: Widget {
         }
         .configurationDisplayName("Flip Clock + Weather")
         .description("See the current time and weather at a glance.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge])
     }
 }

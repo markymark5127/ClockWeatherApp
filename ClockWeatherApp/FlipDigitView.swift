@@ -3,6 +3,7 @@ import SwiftUI
 struct FlipDigitView: View {
     let digit: String
     let fontName: String
+    var height: CGFloat = 40
 
     @State private var previousDigit: String = ""
     @State private var animateTop = false
@@ -11,8 +12,8 @@ struct FlipDigitView: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                SingleDigitView(text: digit, fontName: fontName, type: SingleDigitView.FlipType.top)
-                SingleDigitView(text: previousDigit, fontName: fontName, type: SingleDigitView.FlipType.top)
+                SingleDigitView(text: digit, fontName: fontName, type: SingleDigitView.FlipType.top, height: height)
+                SingleDigitView(text: previousDigit, fontName: fontName, type: SingleDigitView.FlipType.top, height: height)
                     .rotation3DEffect(.degrees(animateTop ? -90 : 0),
                                       axis: (x: 1, y: 0, z: 0),
                                       anchor: .bottom,
@@ -25,8 +26,8 @@ struct FlipDigitView: View {
                 .frame(height: 1)
 
             ZStack {
-                SingleDigitView(text: previousDigit, fontName: fontName, type: SingleDigitView.FlipType.bottom)
-                SingleDigitView(text: digit, fontName: fontName, type: SingleDigitView.FlipType.bottom)
+                SingleDigitView(text: previousDigit, fontName: fontName, type: SingleDigitView.FlipType.bottom, height: height)
+                SingleDigitView(text: digit, fontName: fontName, type: SingleDigitView.FlipType.bottom, height: height)
                     .rotation3DEffect(.degrees(animateBottom ? 0 : 90),
                                       axis: (x: 1, y: 0, z: 0),
                                       anchor: .top,

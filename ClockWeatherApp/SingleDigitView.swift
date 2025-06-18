@@ -12,23 +12,24 @@ struct SingleDigitView: View {
     let text: String
     let fontName: String
     let type: FlipType
+    var height: CGFloat = 40
 
     var body: some View {
-        let width = CGFloat(40 * max(1, text.count))
-        let fontSize: CGFloat = 60
+        let width = CGFloat(height * max(1, text.count))
+        let fontSize: CGFloat = height * 1.5
         let font = UIFont(name: fontName, size: fontSize) ?? .systemFont(ofSize: fontSize)
         let sample = ("8" as NSString).size(withAttributes: [.font: font])
-        let offset = (40 - sample.height) / 2
+        let offset = (height - sample.height) / 2
         Text(text)
             .font(.custom(fontName, size: fontSize))
             .offset(y: offset)
             .foregroundColor(.white)
-            .frame(width: width, height: 40, alignment: type.alignment)
-            .padding(type.padding, -8)
+            .frame(width: width, height: height, alignment: type.alignment)
+            .padding(type.padding, -height / 5)
             .clipped()
             .background(Color.black)
-            .cornerRadius(8)
-            .padding(type.padding, -4)
+            .cornerRadius(height / 5)
+            .padding(type.padding, -height / 10)
     }
 
     enum FlipType {
