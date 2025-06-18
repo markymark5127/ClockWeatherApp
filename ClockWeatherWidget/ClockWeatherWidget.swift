@@ -282,7 +282,7 @@ struct ClockWeatherWidgetEntryView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .containerBackground(Color.clear, for: .widget)
+        .containerBackground(.ultraThinMaterial, for: .widget)
     }
 
     private var weatherInfo: some View {
