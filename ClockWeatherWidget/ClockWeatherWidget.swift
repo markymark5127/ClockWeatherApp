@@ -23,7 +23,7 @@ struct WidgetSingleDigitView: View {
             .padding(type.padding, -8)
             .clipped()
             .background(Color.white)
-            .cornerRadius(4)
+            .cornerRadius(8)
             .padding(type.padding, -4)
     }
 

@@ -27,7 +27,7 @@ struct SingleDigitView: View {
             .padding(type.padding, -8)
             .clipped()
             .background(Color.black)
-            .cornerRadius(4)
+            .cornerRadius(8)
             .padding(type.padding, -4)
     }
 
