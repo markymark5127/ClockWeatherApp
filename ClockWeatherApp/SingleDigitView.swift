@@ -19,8 +19,9 @@ struct SingleDigitView: View {
         DigitHalfView(digit: text, fontName: fontName, clipTop: type == .top)
             .frame(width: width, height: height)
             .background(Color.black)
+            .cornerRadius(height / 5)
             .clipShape(RoundedCorners(radius: height / 5,
-                                     corners: type == .top ? [.topLeft, .topRight] : [.bottomLeft, .bottomRight]))
+                                        corners: type == .top ? [.topLeft, .topRight] : [.bottomLeft, .bottomRight]))
             .padding(type.padding, -height / 10)
     }
 
