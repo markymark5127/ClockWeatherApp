@@ -3,31 +3,34 @@ import SwiftUI
 import Foundation
 import UIKit
 
-/// Flip digit view for the widget that mirrors the design used in the main app.
-
-struct WidgetDigitHalfView: View {
-    let digit: String
+/// Single digit view used by the widget and mimicking the main app style.
+struct WidgetSingleDigitView: View {
+    let text: String
     let fontName: String
-    let clipTop: Bool
+    let type: FlipType
 
     var body: some View {
         GeometryReader { geo in
-            let height = geo.size.height
-            let width = geo.size.width
-            let halfHeight = height / 2
+            let size = min(geo.size.width, geo.size.height)
 
-            ZStack(alignment: .top) {
-                Text(digit)
-                    .font(.custom(fontName, size: height * 1.4))
-                    .frame(width: width, height: height * 1.4)
-                    .minimumScaleFactor(0.1)
-                    .lineLimit(1)
-                    .foregroundStyle(.white)
-                    .background(Color.black)
-            }
-            .frame(width: width, height: halfHeight, alignment: clipTop ? .top : .bottom)
-            .clipped()
+            Text(text)
+                .font(.custom(fontName, size: size * 1.2))
+                .foregroundStyle(.white)
+                .frame(width: geo.size.width, height: geo.size.height, alignment: type.alignment)
+                .padding(type.padding, -size * 0.2)
+                .clipped()
+                .background(Color.black)
+                .cornerRadius(4)
+                .padding(type.padding, -size * 0.1)
         }
+    }
+
+    enum FlipType {
+        case top
+        case bottom
+
+        var padding: Edge.Set { self == .top ? .bottom : .top }
+        var alignment: Alignment { self == .top ? .bottom : .top }
     }
 }
 
@@ -48,33 +51,26 @@ struct WidgetFlipDigitView: View {
     @State private var bottomRotation: Double = 0
 
     var body: some View {
-        GeometryReader { geo in
-            let halfHeight = geo.size.height / 2
-            let width = geo.size.width
-
-            VStack(spacing: 0) {
-                ZStack {
-                    WidgetDigitHalfView(digit: previousDigit, fontName: fontName, clipTop: true)
-                    WidgetDigitHalfView(digit: digit, fontName: fontName, clipTop: true)
-                        .rotation3DEffect(.degrees(topRotation), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
-                        .opacity(topRotation != 0 ? 1 : 0)
-                }
-                .frame(width: width, height: halfHeight)
-
-                ZStack {
-                    WidgetDigitHalfView(digit: digit, fontName: fontName, clipTop: false)
-                        .opacity(bottomRotation == 0 ? 1 : 0)
-                    WidgetDigitHalfView(digit: previousDigit, fontName: fontName, clipTop: false)
-                        .rotation3DEffect(.degrees(bottomRotation), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
-                        .opacity(bottomRotation != 0 ? 1 : 0)
-                }
-                .frame(width: width, height: halfHeight)
+        VStack(spacing: 0) {
+            ZStack {
+                WidgetSingleDigitView(text: digit, fontName: fontName, type: .top)
+                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: .top)
+                    .rotation3DEffect(.degrees(topRotation), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
             }
-            .frame(width: width, height: geo.size.height)
+            .clipped()
+
+            Rectangle()
+                .fill(Color.gray.opacity(0.4))
+                .frame(height: 1)
+
+            ZStack {
+                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: .bottom)
+                WidgetSingleDigitView(text: digit, fontName: fontName, type: .bottom)
+                    .rotation3DEffect(.degrees(bottomRotation), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
+            }
+            .clipped()
         }
-        .aspectRatio(0.6, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
+        .fixedSize()
         .onAppear { previousDigit = digit }
         .onChange(of: digit) { _, newValue in
             withAnimation(.easeInOut(duration: 0.25)) {
