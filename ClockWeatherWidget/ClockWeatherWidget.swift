@@ -3,6 +3,41 @@ import SwiftUI
 import Foundation
 import UIKit
 
+/// View that clips either the top or bottom half of the provided digit.
+private struct WidgetDigitHalfView: View {
+    let digit: String
+    let fontName: String
+    let clipTop: Bool
+
+    var body: some View {
+        GeometryReader { geo in
+            let size = geo.size
+            let half = size.height / 2
+
+            Text(digit)
+                .font(.custom(fontName, size: size.height * 1.5))
+                .frame(width: size.width, height: size.height)
+                .foregroundStyle(.black)
+                .background(Color.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.1)
+                .clipped()
+                .mask(
+                    VStack(spacing: 0) {
+                        if clipTop {
+                            Rectangle().frame(height: half)
+                            Color.clear.frame(height: half)
+                        } else {
+                            Color.clear.frame(height: half)
+                            Rectangle().frame(height: half)
+                        }
+                    }
+                )
+        }
+        .clipped()
+    }
+}
+
 /// Single digit view used by the widget and mimicking the main app style.
 struct WidgetSingleDigitView: View {
     let text: String
@@ -12,17 +47,8 @@ struct WidgetSingleDigitView: View {
 
     var body: some View {
         let width = height * CGFloat(max(1, text.count))
-        let fontSize: CGFloat = height * 1.5
-        let font = UIFont(name: fontName, size: fontSize) ?? .systemFont(ofSize: fontSize)
-        let sample = ("8" as NSString).size(withAttributes: [.font: font])
-        let offset = (height - sample.height) / 2
-        Text(text)
-            .font(.custom(fontName, size: fontSize))
-            .offset(y: offset)
-            .foregroundColor(.black)
-            .frame(width: width, height: height, alignment: type.alignment)
-            .padding(type.padding, -height / 5)
-            .clipped()
+        WidgetDigitHalfView(digit: text, fontName: fontName, clipTop: type == .top)
+            .frame(width: width, height: height)
             .background(Color.white)
             .cornerRadius(height / 5)
             .padding(type.padding, -height / 10)
@@ -235,49 +261,74 @@ struct ClockWeatherWidgetEntryView: View {
             }
         }()
 
-        VStack(spacing: 12) {
-            HStack(spacing: 8) {
-                WidgetFlipDigitView(digit: entry.hour, fontName: entry.fontName, height: digitHeight)
-                WidgetFlipDigitView(digit: entry.minute, fontName: entry.fontName, height: digitHeight)
-            }
-            .frame(height: digitHeight * 2)
+        Group {
+            if family == .systemExtraLarge {
+                GeometryReader { geo in
+                    let h = geo.size.height
+                    let largeDigit = h * 0.35
 
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(entry.city)
-                        .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption1).pointSize))
-                    Text(entry.condition)
-                        .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption2).pointSize))
-                }
-
-                Spacer()
-
-                VStack(alignment: .trailing) {
-                    Text(entry.date, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day())
-                        .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption1).pointSize))
-                    HStack(alignment: .center, spacing: 4) {
-                        Text(entry.temperature)
-                            .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .title2).pointSize))
-                            .bold()
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text("H: \(entry.highTemp)")
-                            Text("L: \(entry.lowTemp)")
+                    VStack(spacing: 12) {
+                        Spacer(minLength: 0)
+                        HStack(spacing: 8) {
+                            WidgetFlipDigitView(digit: entry.hour, fontName: entry.fontName, height: largeDigit)
+                            WidgetFlipDigitView(digit: entry.minute, fontName: entry.fontName, height: largeDigit)
                         }
-                        .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption2).pointSize))
+                        .frame(height: largeDigit * 2)
+                        Spacer(minLength: 0)
+                        weatherInfo
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            } else {
+                VStack(spacing: 12) {
+                    HStack(spacing: 8) {
+                        WidgetFlipDigitView(digit: entry.hour, fontName: entry.fontName, height: digitHeight)
+                        WidgetFlipDigitView(digit: entry.minute, fontName: entry.fontName, height: digitHeight)
+                    }
+                    .frame(height: digitHeight * 2)
+
+                    weatherInfo
                 }
             }
-            .overlay(
-                Image(systemName: entry.iconName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 24),
-                alignment: .center
-            )
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
         .containerBackground(Color.clear, for: .widget)
+    }
+
+    private var weatherInfo: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(entry.city)
+                    .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption1).pointSize))
+                Text(entry.condition)
+                    .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption2).pointSize))
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing) {
+                Text(entry.date, format: .dateTime.weekday(.abbreviated).month(.abbreviated).day())
+                    .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption1).pointSize))
+                HStack(alignment: .center, spacing: 4) {
+                    Text(entry.temperature)
+                        .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .title2).pointSize))
+                        .bold()
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("H: \(entry.highTemp)")
+                        Text("L: \(entry.lowTemp)")
+                    }
+                    .font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption2).pointSize))
+                }
+            }
+        }
+        .overlay(
+            Image(systemName: entry.iconName)
+                .resizable()
+                .scaledToFit()
+                .frame(height: 24),
+            alignment: .center
+        )
     }
 }
 
@@ -290,6 +341,6 @@ struct ClockWeatherWidget: Widget {
         }
         .configurationDisplayName("Flip Clock + Weather")
         .description("See the current time and weather at a glance.")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge])
+        .supportedFamilies([.systemMedium, .systemLarge, .systemExtraLarge])
     }
 }

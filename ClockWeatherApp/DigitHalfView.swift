@@ -10,6 +10,8 @@ struct DigitHalfView: View {
     let digit: String
     let fontName: String
     let clipTop: Bool
+    var textColor: Color = .white
+    var backgroundColor: Color = .black
 
     var body: some View {
         GeometryReader { geo in
@@ -20,8 +22,8 @@ struct DigitHalfView: View {
                 Text(digit)
                     .font(.custom(fontName, size: size.height * 1.5))
                     .frame(width: size.width, height: size.height)
-                    .foregroundStyle(.white)
-                    .background(Color.black)
+                    .foregroundStyle(textColor)
+                    .background(backgroundColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.1)
                     .clipped()
