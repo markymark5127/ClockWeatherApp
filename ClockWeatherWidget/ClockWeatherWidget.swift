@@ -25,7 +25,10 @@ private struct WidgetDigitHalfView: View {
         case .fullColor:
             return AnyShapeStyle(Color.white)
         default:
-            return AnyShapeStyle(.ultraThinMaterial)
+            // Use a less transparent material so digits remain
+            // readable when the widget is rendered with the
+            // "glass" appearance.
+            return AnyShapeStyle(.regularMaterial)
         }
     }
 
@@ -60,7 +63,9 @@ struct WidgetSingleDigitView: View {
         case .fullColor:
             return AnyShapeStyle(Color.white)
         default:
-            return AnyShapeStyle(.ultraThinMaterial)
+            // Use a more opaque material to improve contrast in
+            // the widget's "glass" rendering mode.
+            return AnyShapeStyle(.regularMaterial)
         }
     }
 
