@@ -3,7 +3,6 @@ import SwiftUI
 import Foundation
 import UIKit
 
-/// View that clips either the top or bottom half of the provided digit.
 private struct WidgetDigitHalfView: View {
     let digit: String
     let fontName: String
@@ -16,7 +15,7 @@ private struct WidgetDigitHalfView: View {
         case .fullColor:
             return .black
         default:
-            return .primary
+            return .white
         }
     }
 
@@ -25,10 +24,7 @@ private struct WidgetDigitHalfView: View {
         case .fullColor:
             return AnyShapeStyle(Color.white)
         default:
-            // Use a less transparent material so digits remain
-            // readable when the widget is rendered with the
-            // "glass" appearance.
-            return AnyShapeStyle(.regularMaterial)
+            return AnyShapeStyle(Color.black.opacity(0.25))
         }
     }
 
@@ -37,19 +33,25 @@ private struct WidgetDigitHalfView: View {
             let size = geo.size
             let textSize = size.height * 2
 
-            Text(digit)
-                .font(.custom(fontName, size: textSize))
-                .frame(width: size.width, height: textSize, alignment: clipTop ? .top : .bottom)
-                .fixedSize()
-                .foregroundStyle(textStyle)
-                .background(backgroundStyle)
-                .offset(y: clipTop ? 0 : -size.height)
+            ZStack {
+                Text(digit)
+                    .font(.custom(fontName, size: textSize))
+                    .frame(width: size.width, height: textSize, alignment: clipTop ? .top : .bottom)
+                    .foregroundStyle(Color.black.opacity(0.4))
+                Text(digit)
+                    .font(.custom(fontName, size: textSize))
+                    .frame(width: size.width, height: textSize, alignment: clipTop ? .top : .bottom)
+                    .foregroundStyle(textStyle)
+            }
+            .background(backgroundStyle)
+            .offset(y: clipTop ? 0 : -size.height)
+            .widgetAccentable(true)
         }
         .clipped()
     }
 }
 
-/// Single digit view used by the widget and mimicking the main app style.
+
 struct WidgetSingleDigitView: View {
     let text: String
     let fontName: String
@@ -63,9 +65,7 @@ struct WidgetSingleDigitView: View {
         case .fullColor:
             return AnyShapeStyle(Color.white)
         default:
-            // Use a more opaque material to improve contrast in
-            // the widget's "glass" rendering mode.
-            return AnyShapeStyle(.regularMaterial)
+            return AnyShapeStyle(Color.black.opacity(0.25))
         }
     }
 
@@ -74,9 +74,9 @@ struct WidgetSingleDigitView: View {
         WidgetDigitHalfView(digit: text, fontName: fontName, clipTop: type == .top)
             .frame(width: width, height: height)
             .background(backgroundStyle)
-            .clipShape(RoundedCorners(radius: height / 5,
-                                     corners: type == .top ? [.topLeft, .topRight] : [.bottomLeft, .bottomRight]))
+            .clipShape(RoundedCorners(radius: height / 5, corners: type == .top ? [.topLeft, .topRight] : [.bottomLeft, .bottomRight]))
             .padding(type.padding, -height / 10)
+            .widgetAccentable(true)
     }
 
     enum FlipType {
@@ -86,70 +86,55 @@ struct WidgetSingleDigitView: View {
         var padding: Edge.Set {
             self == .top ? .bottom : .top
         }
-
-        var alignment: Alignment {
-            self == .top ? .top : .bottom
-        }
     }
 }
 
-
-/// Flip digit view used by the widget.
 struct WidgetFlipDigitView: View {
     let digit: String
     let fontName: String
     var height: CGFloat = 40
-
+    
     @State private var previousDigit: String = ""
     @State private var animateTop = false
     @State private var animateBottom = false
-
+    
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top, height: height)
-                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top, height: height)
-                    .rotation3DEffect(.degrees(animateTop ? -90 : 0),
-                                      axis: (x: 1, y: 0, z: 0),
-                                      anchor: .bottom,
-                                      perspective: 0.5)
+                WidgetSingleDigitView(text: digit, fontName: fontName, type: .top, height: height)
+                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: .top, height: height)
+                    .rotation3DEffect(.degrees(animateTop ? -90 : 0), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
             }
             .clipped()
-
-        Rectangle()
-            .fill(Color.gray.opacity(0.4))
-            .frame(height: 1)
-
-        ZStack {
-            WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom, height: height)
-            WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom, height: height)
-                .rotation3DEffect(.degrees(animateBottom ? 0 : 90),
-                                  axis: (x: 1, y: 0, z: 0),
-                                  anchor: .top,
-                                  perspective: 0.5)
+            
+            Rectangle()
+                .fill(Color.gray.opacity(0.4))
+                .frame(height: 1)
+            
+            ZStack {
+                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: .bottom, height: height)
+                WidgetSingleDigitView(text: digit, fontName: fontName, type: .bottom, height: height)
+                    .rotation3DEffect(.degrees(animateBottom ? 0 : 90), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
+            }
+            .clipped()
         }
-        .clipped()
-    }
-    .fixedSize()
-    .onAppear { previousDigit = digit }
-    .onChange(of: digit) { _, newValue in
-        withAnimation(.easeInOut(duration: 0.25)) {
-            animateTop = true
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            previousDigit = newValue
-            animateTop = false
-            animateBottom = false
+        .fixedSize()
+        .onAppear { previousDigit = digit }
+        .onChange(of: digit) { _, newValue in
             withAnimation(.easeInOut(duration: 0.25)) {
-                animateBottom = true
+                animateTop = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                previousDigit = newValue
+                animateTop = false
+                animateBottom = false
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    animateBottom = true
+                }
             }
         }
     }
 }
-
-}
-
-
 
 struct ClockWeatherEntry: TimelineEntry {
     let date: Date
