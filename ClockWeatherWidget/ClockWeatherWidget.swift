@@ -36,7 +36,7 @@ struct WidgetSingleDigitView: View {
         }
 
         var alignment: Alignment {
-            self == .top ? .bottom : .top
+            self == .top ? .top : .bottom
         }
     }
 }
