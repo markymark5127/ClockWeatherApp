@@ -62,6 +62,7 @@ struct SettingsView: View {
                             Text(name).font(.custom(name, size: 16)).tag(name)
                         }
                     }
+                    .pickerStyle(.navigationLink)
                     .onChange(of: fontName) { _, _ in
                         WidgetCenter.shared.reloadAllTimelines()
                     }
