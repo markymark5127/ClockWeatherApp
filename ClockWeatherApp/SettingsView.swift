@@ -7,7 +7,7 @@ struct SettingsView: View {
     private var unit: String = "fahrenheit"
     @AppStorage("timeFormat", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
     private var timeFormat: String = "24hr"
-    @AppStorage("locationMode", store: UserDefaults(suiteName: "group.com.yourcompany.ClockWeatherApp"))
+    @AppStorage("locationMode", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
     private var locationMode: String = "currentlocation"
     @AppStorage("fontName", store: UserDefaults(suiteName: "group.com.markmayne.ClockWeatherApp"))
     private var fontName: String = UIFont.systemFont(ofSize: 17).familyName

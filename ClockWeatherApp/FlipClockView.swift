@@ -17,8 +17,8 @@ struct FlipClockView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            ForEach(Array(currentTime.hour), id: \.self) {
-                FlipDigitView(digit: String($0), fontName: fontName)
+            ForEach(Array(currentTime.hour.enumerated()), id: \.offset) { _, ch in
+                FlipDigitView(digit: String(ch), fontName: fontName)
             }
 
             Text(":")
@@ -26,8 +26,8 @@ struct FlipClockView: View {
                 .foregroundColor(.white)
                 .offset(y: -10)
 
-            ForEach(Array(currentTime.minute), id: \.self) {
-                FlipDigitView(digit: String($0), fontName: fontName)
+            ForEach(Array(currentTime.minute.enumerated()), id: \.offset) { _, ch in
+                FlipDigitView(digit: String(ch), fontName: fontName)
             }
         }
         .onAppear {
