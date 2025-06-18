@@ -54,8 +54,8 @@ struct WidgetFlipDigitView: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
-                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
+                WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top)
+                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top)
                     .rotation3DEffect(.degrees(animateTop ? -90 : 0),
                                       axis: (x: 1, y: 0, z: 0),
                                       anchor: .bottom,
@@ -68,8 +68,8 @@ struct WidgetFlipDigitView: View {
             .frame(height: 1)
 
         ZStack {
-            WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top)
-            WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top)
+            WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
+            WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
                 .rotation3DEffect(.degrees(animateBottom ? 0 : 90),
                                   axis: (x: 1, y: 0, z: 0),
                                   anchor: .top,
