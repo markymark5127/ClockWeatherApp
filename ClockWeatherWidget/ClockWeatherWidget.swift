@@ -12,27 +12,14 @@ private struct WidgetDigitHalfView: View {
     var body: some View {
         GeometryReader { geo in
             let size = geo.size
-            let half = size.height / 2
+            let textSize = size.height * 2
 
             Text(digit)
-                .font(.custom(fontName, size: size.height * 1.5))
-                .frame(width: size.width, height: size.height)
+                .font(.custom(fontName, size: textSize))
+                .frame(width: size.width, height: textSize, alignment: clipTop ? .top : .bottom)
                 .foregroundStyle(.black)
                 .background(Color.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.1)
-                .clipped()
-                .mask(
-                    VStack(spacing: 0) {
-                        if clipTop {
-                            Rectangle().frame(height: half)
-                            Color.clear.frame(height: half)
-                        } else {
-                            Color.clear.frame(height: half)
-                            Rectangle().frame(height: half)
-                        }
-                    }
-                )
+                .offset(y: clipTop ? 0 : -size.height)
         }
         .clipped()
     }

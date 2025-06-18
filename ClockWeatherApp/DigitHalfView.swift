@@ -16,29 +16,14 @@ struct DigitHalfView: View {
     var body: some View {
         GeometryReader { geo in
             let size = geo.size
-            let halfHeight = size.height / 2
+            let textSize = size.height * 2
 
-            ZStack {
-                Text(digit)
-                    .font(.custom(fontName, size: size.height * 1.5))
-                    .frame(width: size.width, height: size.height)
-                    .foregroundStyle(textColor)
-                    .background(backgroundColor)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.1)
-                    .clipped()
-            }
-            .mask(
-                VStack(spacing: 0) {
-                    if clipTop {
-                        Rectangle().frame(height: halfHeight)
-                        Color.clear.frame(height: halfHeight)
-                    } else {
-                        Color.clear.frame(height: halfHeight)
-                        Rectangle().frame(height: halfHeight)
-                    }
-                }
-            )
+            Text(digit)
+                .font(.custom(fontName, size: textSize))
+                .frame(width: size.width, height: textSize, alignment: clipTop ? .top : .bottom)
+                .foregroundStyle(textColor)
+                .background(backgroundColor)
+                .offset(y: clipTop ? 0 : -size.height)
         }
         .clipped()
     }
