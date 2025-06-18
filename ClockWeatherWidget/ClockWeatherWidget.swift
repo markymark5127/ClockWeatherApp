@@ -14,14 +14,14 @@ struct WidgetSingleDigitView: View {
             let size = min(geo.size.width, geo.size.height)
 
             Text(text)
-                .font(.custom(fontName, size: size * 1.2))
-                .foregroundStyle(.white)
+                .font(.custom(fontName, size: size * 1.5))
+                .foregroundStyle(.black)
                 .frame(width: geo.size.width, height: geo.size.height, alignment: type.alignment)
-                .padding(type.padding, -size * 0.2)
+                .padding(type.padding, -size * 0.25)
                 .clipped()
-                .background(Color.black)
+                .background(Color.white)
                 .cornerRadius(4)
-                .padding(type.padding, -size * 0.1)
+                .padding(type.padding, -size * 0.125)
         }
     }
 
@@ -158,22 +158,23 @@ struct ClockWeatherWidgetEntryView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 ForEach(Array(entry.hour.enumerated()), id: \.offset) { _, ch in
                     let digit = String(ch)
                     WidgetFlipDigitView(digit: digit, fontName: entry.fontName)
                 }
 
                 Text(":")
-                    .font(.system(size: 40, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.white)
-                    .offset(y: -8)
+                    .font(.system(size: 50, weight: .bold, design: .monospaced))
+                    .foregroundStyle(.black)
+                    .offset(y: -10)
 
                 ForEach(Array(entry.minute.enumerated()), id: \.offset) { _, ch in
                     let digit = String(ch)
                     WidgetFlipDigitView(digit: digit, fontName: entry.fontName)
                 }
             }
+            .frame(height: 120)
 
             VStack(alignment: .leading) {
                 Text(entry.city).font(.custom(entry.fontName, size: UIFont.preferredFont(forTextStyle: .caption1).pointSize))
