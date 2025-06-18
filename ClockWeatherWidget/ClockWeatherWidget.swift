@@ -38,16 +38,24 @@ struct WidgetSingleDigitView: View {
 
 /// Flip digit view used by the widget.
 struct WidgetFlipDigitView: View {
-    VStack(spacing: 0) {
-        ZStack {
-            WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
-            WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
-                .rotation3DEffect(.degrees(animateTop ? -90 : 0),
-                                  axis: (x: 1, y: 0, z: 0),
-                                  anchor: .bottom,
-                                  perspective: 0.5)
-        }
-        .clipped()
+    let digit: String
+    let fontName: String
+
+    @State private var previousDigit: String = ""
+    @State private var animateTop = false
+    @State private var animateBottom = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ZStack {
+                WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
+                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
+                    .rotation3DEffect(.degrees(animateTop ? -90 : 0),
+                                      axis: (x: 1, y: 0, z: 0),
+                                      anchor: .bottom,
+                                      perspective: 0.5)
+            }
+            .clipped()
 
         Rectangle()
             .fill(Color.gray.opacity(0.4))
@@ -79,6 +87,10 @@ struct WidgetFlipDigitView: View {
         }
     }
 }
+
+}
+
+
 
 struct ClockWeatherEntry: TimelineEntry {
     let date: Date
