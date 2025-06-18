@@ -36,7 +36,8 @@ struct ContentView: View {
         }
         .onAppear {
             self.time = getCurrentTime()
-            Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+            // Refresh every second to keep the display in sync with the system clock
+            Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
                 self.time = getCurrentTime()
             }
         }
