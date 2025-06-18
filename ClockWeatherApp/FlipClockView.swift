@@ -13,7 +13,8 @@ struct FlipClockView: View {
     let fontName: String
     let timeFormat: String
 
-    private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    // Update every second so the minute flips exactly when the system clock changes
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         HStack(spacing: 8) {

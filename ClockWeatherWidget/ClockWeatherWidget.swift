@@ -134,7 +134,6 @@ struct ClockWeatherProvider: TimelineProvider {
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<ClockWeatherEntry>) -> Void) {
-        let time = getCurrentTime()
         let defaults = sharedDefaults()
         let temp = defaults?.string(forKey: "temperature") ?? "--°"
         let cond = defaults?.string(forKey: "condition") ?? "Updating..."
@@ -149,28 +148,37 @@ struct ClockWeatherProvider: TimelineProvider {
         let low = defaults?.string(forKey: "lowTemp") ?? "--"
         let font = defaults?.string(forKey: "fontName") ?? UIFont.systemFont(ofSize: 17).familyName
 
-        let entry = ClockWeatherEntry(
-            date: Date(),
-            temperature: temp,
-            condition: cond,
-            city: city,
-            iconName: icon,
-            highTemp: high,
-            lowTemp: low,
-            hour: time.hour,
-            minute: time.minute,
-            fontName: font
-        )
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 1, to: Date())!
-        completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
+        var entries: [ClockWeatherEntry] = []
+        let currentDate = Date()
+        for offset in 0..<60 {
+            let entryDate = Calendar.current.date(byAdding: .minute, value: offset, to: currentDate)!
+            let time = getCurrentTime(for: entryDate)
+            entries.append(
+                ClockWeatherEntry(
+                    date: entryDate,
+                    temperature: temp,
+                    condition: cond,
+                    city: city,
+                    iconName: icon,
+                    highTemp: high,
+                    lowTemp: low,
+                    hour: time.hour,
+                    minute: time.minute,
+                    fontName: font
+                )
+            )
+        }
+
+        let policyDate = Calendar.current.date(byAdding: .minute, value: 60, to: currentDate)!
+        completion(Timeline(entries: entries, policy: .after(policyDate)))
     }
 
-    func getCurrentTime() -> (hour: String, minute: String) {
+    func getCurrentTime(for date: Date = Date()) -> (hour: String, minute: String) {
         let defaults = sharedDefaults()
         let format = defaults?.string(forKey: "timeFormat") ?? "24hr"
         let formatter = DateFormatter()
         formatter.dateFormat = format == "12hr" ? "hh:mm" : "HH:mm"
-        let time = formatter.string(from: Date()).split(separator: ":")
+        let time = formatter.string(from: date).split(separator: ":")
         return (String(time[0]), String(time[1]))
     }
 
