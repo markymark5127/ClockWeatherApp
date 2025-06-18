@@ -9,6 +9,26 @@ private struct WidgetDigitHalfView: View {
     let fontName: String
     let clipTop: Bool
 
+    @Environment(\.widgetRenderingMode) private var renderingMode
+
+    private var textStyle: Color {
+        switch renderingMode {
+        case .fullColor:
+            return .black
+        default:
+            return .primary
+        }
+    }
+
+    private var backgroundStyle: AnyShapeStyle {
+        switch renderingMode {
+        case .fullColor:
+            return AnyShapeStyle(Color.white)
+        default:
+            return AnyShapeStyle(.ultraThinMaterial)
+        }
+    }
+
     var body: some View {
         GeometryReader { geo in
             let size = geo.size
@@ -18,8 +38,8 @@ private struct WidgetDigitHalfView: View {
                 .font(.custom(fontName, size: textSize))
                 .frame(width: size.width, height: textSize, alignment: clipTop ? .top : .bottom)
                 .fixedSize()
-                .foregroundStyle(.black)
-                .background(Color.white)
+                .foregroundStyle(textStyle)
+                .background(backgroundStyle)
                 .offset(y: clipTop ? 0 : -size.height)
         }
         .clipped()
@@ -33,11 +53,22 @@ struct WidgetSingleDigitView: View {
     let type: FlipType
     var height: CGFloat = 40
 
+    @Environment(\.widgetRenderingMode) private var renderingMode
+
+    private var backgroundStyle: AnyShapeStyle {
+        switch renderingMode {
+        case .fullColor:
+            return AnyShapeStyle(Color.white)
+        default:
+            return AnyShapeStyle(.ultraThinMaterial)
+        }
+    }
+
     var body: some View {
         let width = height * CGFloat(max(1, text.count))
         WidgetDigitHalfView(digit: text, fontName: fontName, clipTop: type == .top)
             .frame(width: width, height: height)
-            .background(Color.white)
+            .background(backgroundStyle)
             .clipShape(RoundedCorners(radius: height / 5,
                                      corners: type == .top ? [.topLeft, .topRight] : [.bottomLeft, .bottomRight]))
             .padding(type.padding, -height / 10)
@@ -171,7 +202,11 @@ struct ClockWeatherProvider: TimelineProvider {
         let font = defaults?.string(forKey: "fontName") ?? UIFont.systemFont(ofSize: 17).familyName
 
         var entries: [ClockWeatherEntry] = []
-        let currentDate = Date()
+        let now = Date()
+        var currentDate = Calendar.current.date(bySetting: .second, value: 0, of: now) ?? now
+        if currentDate <= now {
+            currentDate = Calendar.current.date(byAdding: .minute, value: 1, to: currentDate)!
+        }
         for offset in 0..<60 {
             let entryDate = Calendar.current.date(byAdding: .minute, value: offset, to: currentDate)!
             let time = getCurrentTime(for: entryDate)
