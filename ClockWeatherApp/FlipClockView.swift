@@ -12,14 +12,15 @@ struct FlipClockView: View {
     @State private var currentTime: (hour: String, minute: String) = ("--", "--")
     let fontName: String
     let timeFormat: String
+    var digitHeight: CGFloat = 40
 
     // Update every second so the minute flips exactly when the system clock changes
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         HStack(spacing: 8) {
-            FlipDigitView(digit: currentTime.hour, fontName: fontName)
-            FlipDigitView(digit: currentTime.minute, fontName: fontName)
+            FlipDigitView(digit: currentTime.hour, fontName: fontName, height: digitHeight)
+            FlipDigitView(digit: currentTime.minute, fontName: fontName, height: digitHeight)
         }
         .onAppear {
             updateTime()

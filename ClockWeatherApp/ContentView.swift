@@ -25,8 +25,7 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 16) {
             HStack(spacing: 8) {
-                FlipClockView(fontName: fontName, timeFormat: timeFormat)
-                    .frame(height: 120)
+                FlipClockView(fontName: fontName, timeFormat: timeFormat, digitHeight: 80)
             }
 
             GlassWeatherCard(weather: weather)
