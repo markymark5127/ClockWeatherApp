@@ -17,6 +17,7 @@ private struct WidgetDigitHalfView: View {
             Text(digit)
                 .font(.custom(fontName, size: textSize))
                 .frame(width: size.width, height: textSize, alignment: clipTop ? .top : .bottom)
+                .fixedSize()
                 .foregroundStyle(.black)
                 .background(Color.white)
                 .offset(y: clipTop ? 0 : -size.height)
@@ -37,7 +38,8 @@ struct WidgetSingleDigitView: View {
         WidgetDigitHalfView(digit: text, fontName: fontName, clipTop: type == .top)
             .frame(width: width, height: height)
             .background(Color.white)
-            .cornerRadius(height / 5)
+            .clipShape(RoundedCorners(radius: height / 5,
+                                     corners: type == .top ? [.topLeft, .topRight] : [.bottomLeft, .bottomRight]))
             .padding(type.padding, -height / 10)
     }
 

@@ -21,6 +21,7 @@ struct DigitHalfView: View {
             Text(digit)
                 .font(.custom(fontName, size: textSize))
                 .frame(width: size.width, height: textSize, alignment: clipTop ? .top : .bottom)
+                .fixedSize()
                 .foregroundStyle(textColor)
                 .background(backgroundColor)
                 .offset(y: clipTop ? 0 : -size.height)
