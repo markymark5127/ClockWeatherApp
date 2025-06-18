@@ -13,10 +13,11 @@ struct SingleDigitView: View {
     let type: FlipType
 
     var body: some View {
+        let width = CGFloat(40 * max(1, text.count))
         Text(text)
             .font(.custom(fontName, size: 60))
             .foregroundColor(.white)
-            .frame(width: 40, height: 40, alignment: type.alignment)
+            .frame(width: width, height: 40, alignment: type.alignment)
             .padding(type.padding, -8)
             .clipped()
             .background(Color.black)

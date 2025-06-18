@@ -10,13 +10,14 @@ struct WidgetSingleDigitView: View {
     let type: FlipType
 
     var body: some View {
+        let width = CGFloat(40 * max(1, text.count))
         Text(text)
             .font(.custom(fontName, size: 60))
-            .foregroundColor(.white)
-            .frame(width: 40, height: 40, alignment: type.alignment)
+            .foregroundColor(.black)
+            .frame(width: width, height: 40, alignment: type.alignment)
             .padding(type.padding, -8)
             .clipped()
-            .background(Color.black)
+            .background(Color.white)
             .cornerRadius(4)
             .padding(type.padding, -4)
     }
@@ -163,20 +164,8 @@ struct ClockWeatherWidgetEntryView: View {
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 8) {
-                ForEach(Array(entry.hour.enumerated()), id: \.offset) { _, ch in
-                    let digit = String(ch)
-                    WidgetFlipDigitView(digit: digit, fontName: entry.fontName)
-                }
-
-                Text(":")
-                    .font(.system(size: 50, weight: .bold, design: .monospaced))
-                    .foregroundStyle(.black)
-                    .offset(y: -10)
-
-                ForEach(Array(entry.minute.enumerated()), id: \.offset) { _, ch in
-                    let digit = String(ch)
-                    WidgetFlipDigitView(digit: digit, fontName: entry.fontName)
-                }
+                WidgetFlipDigitView(digit: entry.hour, fontName: entry.fontName)
+                WidgetFlipDigitView(digit: entry.minute, fontName: entry.fontName)
             }
             .frame(height: 120)
 
