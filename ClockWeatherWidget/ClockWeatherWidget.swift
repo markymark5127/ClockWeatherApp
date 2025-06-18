@@ -11,7 +11,7 @@ struct WidgetSingleDigitView: View {
     var height: CGFloat = 40
 
     var body: some View {
-        let width = CGFloat(height * max(1, text.count))
+        let width = height * CGFloat(max(1, text.count))
         let fontSize: CGFloat = height * 1.5
         let font = UIFont(name: fontName, size: fontSize) ?? .systemFont(ofSize: fontSize)
         let sample = ("8" as NSString).size(withAttributes: [.font: font])
