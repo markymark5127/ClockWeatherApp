@@ -10,79 +10,71 @@ struct WidgetSingleDigitView: View {
     let type: FlipType
 
     var body: some View {
-        GeometryReader { geo in
-            let size = min(geo.size.width, geo.size.height)
-
-            Text(text)
-                .font(.custom(fontName, size: size * 1.5))
-                .foregroundStyle(.black)
-                .frame(width: geo.size.width, height: geo.size.height, alignment: type.alignment)
-                .padding(type.padding, -size * 0.25)
-                .clipped()
-                .background(Color.white)
-                .cornerRadius(4)
-                .padding(type.padding, -size * 0.125)
-        }
+        Text(text)
+            .font(.custom(fontName, size: 60))
+            .foregroundColor(.white)
+            .frame(width: 40, height: 40, alignment: type.alignment)
+            .padding(type.padding, -8)
+            .clipped()
+            .background(Color.black)
+            .cornerRadius(4)
+            .padding(type.padding, -4)
     }
 
     enum FlipType {
         case top
         case bottom
 
-        var padding: Edge.Set { self == .top ? .bottom : .top }
-        var alignment: Alignment { self == .top ? .bottom : .top }
+        var padding: Edge.Set {
+            self == .top ? .bottom : .top
+        }
+
+        var alignment: Alignment {
+            self == .top ? .bottom : .top
+        }
     }
 }
 
 
-
-
-
-
-
-
 /// Flip digit view used by the widget.
 struct WidgetFlipDigitView: View {
-    let digit: String
-    let fontName: String
-
-    @State private var previousDigit: String = ""
-    @State private var topRotation: Double = 0
-    @State private var bottomRotation: Double = 0
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                WidgetSingleDigitView(text: digit, fontName: fontName, type: .top)
-                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: .top)
-                    .rotation3DEffect(.degrees(topRotation), axis: (x: 1, y: 0, z: 0), anchor: .bottom, perspective: 0.5)
-            }
-            .clipped()
-
-            Rectangle()
-                .fill(Color.gray.opacity(0.4))
-                .frame(height: 1)
-
-            ZStack {
-                WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: .bottom)
-                WidgetSingleDigitView(text: digit, fontName: fontName, type: .bottom)
-                    .rotation3DEffect(.degrees(bottomRotation), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
-            }
-            .clipped()
+    VStack(spacing: 0) {
+        ZStack {
+            WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
+            WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.bottom)
+                .rotation3DEffect(.degrees(animateTop ? -90 : 0),
+                                  axis: (x: 1, y: 0, z: 0),
+                                  anchor: .bottom,
+                                  perspective: 0.5)
         }
-        .fixedSize()
-        .onAppear { previousDigit = digit }
-        .onChange(of: digit) { _, newValue in
+        .clipped()
+
+        Rectangle()
+            .fill(Color.gray.opacity(0.4))
+            .frame(height: 1)
+
+        ZStack {
+            WidgetSingleDigitView(text: previousDigit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top)
+            WidgetSingleDigitView(text: digit, fontName: fontName, type: WidgetSingleDigitView.FlipType.top)
+                .rotation3DEffect(.degrees(animateBottom ? 0 : 90),
+                                  axis: (x: 1, y: 0, z: 0),
+                                  anchor: .top,
+                                  perspective: 0.5)
+        }
+        .clipped()
+    }
+    .fixedSize()
+    .onAppear { previousDigit = digit }
+    .onChange(of: digit) { _, newValue in
+        withAnimation(.easeInOut(duration: 0.25)) {
+            animateTop = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            previousDigit = newValue
+            animateTop = false
+            animateBottom = false
             withAnimation(.easeInOut(duration: 0.25)) {
-                topRotation = -90
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                previousDigit = newValue
-                topRotation = 0
-                bottomRotation = 90
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    bottomRotation = 0
-                }
+                animateBottom = true
             }
         }
     }
